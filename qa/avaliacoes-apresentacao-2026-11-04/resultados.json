@@ -1,0 +1,25 @@
+{
+  "npm_ci": true,
+  "verify": true,
+  "normal_browser": true,
+  "presentation_browser": true,
+  "android_ios_web_export": true,
+  "seed_applied_and_verified": true,
+  "seed_rows": 20,
+  "places": {
+    "nereu": "Praça Nereu Ramos",
+    "congresso": "Praça do Congresso",
+    "osm:way:453621835": "Parque das Nações",
+    "osm:node:9478440538": "Shopping Della",
+    "overture:52e7790c-14ed-4ddb-9e02-82ff0e8985f8": "Criciúma Shopping"
+  },
+  "fictitious": true,
+  "real_reviews_unchanged_at_seed_verification": true,
+  "authenticated_select_tested": true,
+  "anonymous_select": false,
+  "client_insert": false,
+  "client_update": false,
+  "new_security_advisories": 0,
+  "physical_device_tested": false,
+  "targeted_map_stability_mobile_typecheck_lint_after_stacking_fix": "passed"
+}

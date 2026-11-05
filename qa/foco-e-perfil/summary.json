@@ -1,0 +1,125 @@
+{
+  "base": "Elas-main-swoosh-avaliacoes.zip",
+  "base_files": 518,
+  "archive_root": "elas",
+  "checks": {
+    "focus-verify-complete": 0,
+    "focus-browser-357": 0,
+    "focus-browser-320": 0,
+    "focus-export-complete": 0,
+    "welcome": 0
+  },
+  "browser_checks": [
+    {
+      "viewport": {
+        "width": 357,
+        "height": 706
+      },
+      "blur": true,
+      "stableNavigation": true,
+      "rapidTabs": true,
+      "reducedMotion": true,
+      "profileOptions": [
+        "informacoes-pessoais",
+        "configuracoes",
+        "minhas-avaliacoes",
+        "favoritos",
+        "meus-relatos",
+        "minhas-solicitacoes",
+        "notificacoes",
+        "conquistas",
+        "foto-perfil"
+      ],
+      "requestedTransition": {
+        "from": "/alertas",
+        "to": "/mapa",
+        "maxBlur": 14
+      },
+      "sharedReportButtons": true,
+      "reviewSubmission": true,
+      "classifications": [
+        "Seguro",
+        "Moderado",
+        "Cuidado"
+      ],
+      "runtimeErrors": 0
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "blur": true,
+      "stableNavigation": true,
+      "rapidTabs": true,
+      "reducedMotion": true,
+      "profileOptions": [
+        "informacoes-pessoais",
+        "configuracoes",
+        "minhas-avaliacoes",
+        "favoritos",
+        "meus-relatos",
+        "minhas-solicitacoes",
+        "notificacoes",
+        "conquistas",
+        "foto-perfil"
+      ],
+      "requestedTransition": {
+        "from": "/alertas",
+        "to": "/mapa",
+        "maxBlur": 14
+      },
+      "sharedReportButtons": true,
+      "reviewSubmission": true,
+      "classifications": [
+        "Seguro",
+        "Moderado",
+        "Cuidado"
+      ],
+      "runtimeErrors": 0
+    }
+  ],
+  "visual_files_unchanged": [
+    "constants/theme.ts",
+    "components/CitySkyline.tsx",
+    "components/Logo.tsx",
+    "assets/city-modern.jpg",
+    "assets/logo-elas.svg",
+    "assets/places/nereu.jpg",
+    "assets/places/nacoes.jpg",
+    "assets/places/congresso.jpg"
+  ],
+  "physical_device_tested": false,
+  "signed_native_build_created": false,
+  "database_mutated": false,
+  "reviews_created_in_other_users_names": 0,
+  "new_dependencies": {
+    "react-native-reanimated": "4.2.1",
+    "react-native-worklets": "0.7.4"
+  },
+  "changed_files": [
+    "APRESENTACAO-ELAS.md",
+    "Apresentar-ELAS.cmd",
+    "README.md",
+    "app/_layout.tsx",
+    "app/eventos.tsx",
+    "app/favoritos.tsx",
+    "app/historico-impactos.tsx",
+    "app/perfil.tsx",
+    "app/registro.tsx",
+    "components/TouchFeedback.tsx",
+    "components/navigation/TabTransition.tsx",
+    "components/shared/Buttons.tsx",
+    "components/shared/FeaturePage.tsx",
+    "features/reports/OwnRecordsScreen.tsx",
+    "features/reviews/MyReviewsScreen.tsx",
+    "features/reviews/ReviewForm.tsx",
+    "features/reviews/ReviewPlaceSearch.tsx",
+    "package-lock.json",
+    "package.json",
+    "scripts/presentation.mjs",
+    "tests/tab-browser.mjs",
+    "tests/tab-transition.mjs"
+  ],
+  "removed_files": []
+}

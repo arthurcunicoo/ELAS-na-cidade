@@ -1,0 +1,22 @@
+[
+  {
+    "viewport": {
+      "width": 357,
+      "height": 706
+    },
+    "welcome": true,
+    "login": true,
+    "registration": true,
+    "runtimeErrors": 0
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 568
+    },
+    "welcome": true,
+    "login": true,
+    "registration": true,
+    "runtimeErrors": 0
+  }
+]

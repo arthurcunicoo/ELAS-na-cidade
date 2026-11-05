@@ -1,0 +1,122 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+env: load .env
+env: export EXPO_PUBLIC_ACCOUNT_ERASURE_ENABLED EXPO_PUBLIC_APP_ENV EXPO_PUBLIC_DEMO EXPO_PUBLIC_MAP_TILE_ATTRIBUTION EXPO_PUBLIC_MAP_TILE_ATTRIBUTION_URL EXPO_PUBLIC_MAP_TILE_MAX_ZOOM EXPO_PUBLIC_MAP_TILE_MODE EXPO_PUBLIC_MAP_TILE_URL EXPO_PUBLIC_SENTRY_DSN EXPO_PUBLIC_SERVICE_TIMEZONE EXPO_PUBLIC_SHOWCASE EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY EXPO_PUBLIC_SUPABASE_URL
+Starting Metro Bundler
+
+Web node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+iOS node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+| (node:18) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+| (Use `node --trace-warnings ...` to show where the warning was created)
+| (node:18) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+| (Use `node --trace-warnings ...` to show where the warning was created)
+| (node:18) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+| (Use `node --trace-warnings ...` to show where the warning was created)
+| (node:18) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+| (Use `node --trace-warnings ...` to show where the warning was created)
+| (node:18) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+| (Use `node --trace-warnings ...` to show where the warning was created)
+| (node:18) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+| (Use `node --trace-warnings ...` to show where the warning was created)
+Web node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 82.5% (1264/1392)
+iOS node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 83.1% (1560/1711)
+Android node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓░░░░ 79.7% (1451/1625)
+Web Bundled 5212ms node_modules/expo-router/entry.js (1550 modules)
+iOS node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 99.8% (1947/1949)
+Android node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 94.9% (1912/1963)
+iOS Bundled 13123ms node_modules/expo-router/entry.js (1949 modules)
+Android node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 94.9% (1912/1963)
+Android Bundled 20553ms node_modules/expo-router/entry.js (1963 modules)
+
+› Assets (68):
+assets/city-modern.ef3183477f5b05d071e421c70fd628a1.jpg (79KB)
+assets/city-modern.jpg (79KB)
+assets/places/congresso.5e5a6f751e286e4934a134ee36c4cdcb.jpg (100KB)
+assets/places/congresso.jpg (100KB)
+assets/places/nacoes.2992ea646d72766fe7e86dd9f475fa28.jpg (72KB)
+assets/places/nacoes.jpg (72KB)
+assets/places/nereu.b787ea51acdeecfa66a37490da6d09ea.jpg (68KB)
+assets/places/nereu.jpg (68KB)
+node_modules/@expo-google-fonts/material-symbols/100Thin/MaterialSymbols_100Thin.ttf (994KB)
+node_modules/@expo-google-fonts/material-symbols/200ExtraLight/MaterialSymbols_200ExtraLight.ttf (995KB)
+node_modules/@expo-google-fonts/material-symbols/300Light/MaterialSymbols_300Light.ttf (996KB)
+node_modules/@expo-google-fonts/material-symbols/400Regular/MaterialSymbols_400Regular.ttf (967KB)
+node_modules/@expo-google-fonts/material-symbols/500Medium/MaterialSymbols_500Medium.ttf (968KB)
+node_modules/@expo-google-fonts/material-symbols/600SemiBold/MaterialSymbols_600SemiBold.ttf (969KB)
+node_modules/@expo-google-fonts/material-symbols/700Bold/MaterialSymbols_700Bold.ttf (968KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.b4eb097d35f44ed943676fd56f6bdc51.ttf (390KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf (390KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.6e435534bd35da5fef04168860a9b8fa.ttf (1.3MB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf (1.3MB)
+node_modules/expo-router/assets/arrow_down.017bc6ba3fc25503e5eb5e53826d48a8.png (9.5KB)
+node_modules/expo-router/assets/arrow_down.png (9.5KB)
+node_modules/expo-router/assets/error.d1ea1496f9057eb392d5bbf3732a61b7.png (469B)
+node_modules/expo-router/assets/error.png (469B)
+node_modules/expo-router/assets/file.19eeb73b9593a38f8e9f418337fc7d10.png (138B)
+node_modules/expo-router/assets/file.png (138B)
+node_modules/expo-router/assets/forward.d8b800c443b8972542883e0b9de2bdc6.png (188B)
+node_modules/expo-router/assets/forward.png (188B)
+node_modules/expo-router/assets/pkg.ab19f4cbc543357183a20571f68380a3.png (364B)
+node_modules/expo-router/assets/pkg.png (364B)
+node_modules/expo-router/assets/sitemap.412dd9275b6b48ad28f5e3d81bb1f626.png (465B)
+node_modules/expo-router/assets/sitemap.png (465B)
+node_modules/expo-router/assets/unmatched.20e71bdf79e3a97bf55fd9e164041578.png (4.8KB)
+node_modules/expo-router/assets/unmatched.png (4.8KB)
+node_modules/expo-router/node_modules/@react-navigation/elements/lib/module/assets/back-icon-mask.0a328cd9c1afd0afe8e3b1ec5165b1b4.png (653B)
+node_modules/expo-router/node_modules/@react-navigation/elements/lib/module/assets/back-icon-mask.png (653B)
+node_modules/expo-router/node_modules/@react-navigation/elements/lib/module/assets/back-icon.35ba0eaec5a4f5ed12ca16fabeae451d.png (207B)
+node_modules/expo-router/node_modules/@react-navigation/elements/lib/module/assets/back-icon.png (8 variations | 359B)
+node_modules/expo-router/node_modules/@react-navigation/elements/lib/module/assets/clear-icon.c94f6478e7ae0cdd9f15de1fcb9e5e55.png (4 variations | 425B)
+node_modules/expo-router/node_modules/@react-navigation/elements/lib/module/assets/clear-icon.png (4 variations | 425B)
+node_modules/expo-router/node_modules/@react-navigation/elements/lib/module/assets/close-icon.808e1b1b9b53114ec2838071a7e6daa7.png (4 variations | 235B)
+node_modules/expo-router/node_modules/@react-navigation/elements/lib/module/assets/close-icon.png (4 variations | 235B)
+node_modules/expo-router/node_modules/@react-navigation/elements/lib/module/assets/search-icon.286d67d3f74808a60a78d3ebf1a5fb57.png (928B)
+node_modules/expo-router/node_modules/@react-navigation/elements/lib/module/assets/search-icon.png (7 variations | 592B)
+
+› web bundles (34):
+_expo/static/js/web/__common-81b68180737fe39735c082546d804e0e.js (1.8MB)
+_expo/static/js/web/__expo-metro-runtime-1f8f5d3ca6b7f58204d51e14506d73fb.js (4.2KB)
+_expo/static/js/web/_layout-f77c380badef9c1b192e318085a36eb1.js (33KB)
+_expo/static/js/web/admin-8941f5763577a1ab2b9271c85954cd1b.js (11KB)
+_expo/static/js/web/admin-equipe-0a00b08a5b853dd487ba8d3a3d72f25c.js (5.3KB)
+_expo/static/js/web/admin-lugar-13d59ae9bf0e9c338af68a2f354e3148.js (3.4KB)
+_expo/static/js/web/admin-publicacoes-f87cc35b058b2fba1ac610113f32c9e7.js (5.6KB)
+_expo/static/js/web/admin-publicar-0fc951702db6850a0d79390ba81aba9d.js (3.5KB)
+_expo/static/js/web/alertas-4118765872a6ce7b0dfd6181cb1aa0a8.js (9.5KB)
+_expo/static/js/web/avaliar-3b460267d94b6c8c23d2c630df618eb3.js (17KB)
+_expo/static/js/web/cadastro-d3a9cdd22fa72fd53265fd7cacaf5829.js (620B)
+_expo/static/js/web/configuracoes-12c2d90dcd4de8ed96ec511d402a0e95.js (7.4KB)
+_expo/static/js/web/conquistas-5ea24e39d1d4f5b55969e55ea949600c.js (3.7KB)
+_expo/static/js/web/diagnostico-c1560d885c6a5b0bc10629f64c286918.js (1.2KB)
+_expo/static/js/web/entry-06271d5ebd5227cacb81550f7ec00cde.js (1.1MB)
+_expo/static/js/web/eventos-d901354c20c9fce28546551d36cef380.js (22KB)
+_expo/static/js/web/favoritos-5ed981f5b72a128ec50c940758fbd686.js (1.8KB)
+_expo/static/js/web/foto-perfil-f5995af37031bc27d69b5e7632d07876.js (12KB)
+_expo/static/js/web/historico-impactos-13d2e99c192e215009ea1d537047befb.js (2.7KB)
+_expo/static/js/web/impactos-8255c6aa1d9b395868bb5737497f9b61.js (20KB)
+_expo/static/js/web/index-7ea2e5d75918e0f50b2e1146ed7a6079.js (59KB)
+_expo/static/js/web/index-8846c6ddd76cfaa52182f0531ff67693.js (2KB)
+_expo/static/js/web/informacoes-pessoais-134e4b2142cfd4cccc0886bf651d9371.js (3.5KB)
+_expo/static/js/web/login-04dfa6a36d0e88dbb90114646f628aba.js (605B)
+_expo/static/js/web/mapa-46a878abf9c3c5138b2eba132f36530f.js (86KB)
+_expo/static/js/web/meus-relatos-b4fc754cee712c57ab83923968553795.js (624B)
+_expo/static/js/web/minhas-avaliacoes-c768029cc180254399c888017301b4c6.js (4.8KB)
+_expo/static/js/web/minhas-solicitacoes-b02562f51f35a86d74fd226c8f406916.js (626B)
+_expo/static/js/web/notificacoes-3f9e9d4080929138a1e62d45a029e39f.js (5.4KB)
+_expo/static/js/web/novo-relato-6d2411de5bb53ed0c63882c27d0a54db.js (11KB)
+_expo/static/js/web/perfil-c93515c278e8f87e5550a822e9630050.js (13KB)
+_expo/static/js/web/recuperar-senha-27dd7c5def31553bcc1425cea6c70944.js (5.9KB)
+_expo/static/js/web/registro-d47d2f77522a5d85488a0ac37a589349.js (4.9KB)
+_expo/static/js/web/relatos-area-fa3838d4f2761b8d998598efb51ca6ed.js (2.6KB)
+
+› ios bundles (1):
+_expo/static/js/ios/entry-bdd7add5a62d4e546d2ae1930a665c86.hbc (6.1MB)
+
+› android bundles (1):
+_expo/static/js/android/entry-2b91da335476599a67370a70c8c4ce28.hbc (6.2MB)
+
+› Files (2):
+index.html (1.4KB)
+metadata.json (4.4KB)
+
+Exported: ../export-swoosh-final

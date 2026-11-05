@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "browser": "134.0.6998.35",
+  "checks": [
+    "secure-context Web Locks, IndexedDB and WebCrypto available in real Chromium",
+    "two real tabs preserve one usable key under delayed concurrent creation/writes",
+    "ciphertext and non-extractable key survive page reload",
+    "actual IndexedDB CryptoKey cannot be exported",
+    "large Unicode sessions round-trip encrypted with fresh nonce",
+    "concurrent legacy plaintext migration is durable across tabs",
+    "failed migration preserves legacy content and releases browser lock for retry",
+    "ciphertext cannot be substituted into another account/key context",
+    "cross-tab delete waits for the writer and leaves no orphaned ciphertext",
+    "lost browser key fails closed without overwriting ciphertext",
+    "public offline snapshot stays minimal, owner-scoped and expires after TTL",
+    "unsupported-browser path cannot fall back to plaintext writes"
+  ],
+  "scope": "Real Chromium tabs, IndexedDB, WebCrypto, Web Locks and localStorage; raw AsyncStorage timing/failure boundary simulated; not native device E2E."
+}

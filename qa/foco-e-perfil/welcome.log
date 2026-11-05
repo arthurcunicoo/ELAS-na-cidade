@@ -1,0 +1,6 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> elas@1.1.0 qa:welcome
+> node scripts/qa/run-welcome.mjs
+
+{"test":"real Expo web welcome/navigation","checks":[{"viewport":{"width":357,"height":706},"welcome":true,"login":true,"registration":true,"runtimeErrors":0},{"viewport":{"width":320,"height":568},"welcome":true,"login":true,"registration":true,"runtimeErrors":0}]}

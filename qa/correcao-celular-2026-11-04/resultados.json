@@ -1,0 +1,19 @@
+{
+  "npm_ci": true,
+  "verify": true,
+  "expo_export": true,
+  "browser": true,
+  "native_bundles": {
+    "ios": {
+      "bundle": "_expo/static/js/ios/entry-80242beaad1d32f245f4ab9b6b092c15.hbc",
+      "bytes": 7258028
+    },
+    "android": {
+      "bundle": "_expo/static/js/android/entry-f0813e1633d06d95d4e594a35f056d73.hbc",
+      "bytes": 7355869
+    }
+  },
+  "physical_device_tested": false,
+  "db_mutations": false,
+  "crypto_regression_reproduced_before_fix": true
+}

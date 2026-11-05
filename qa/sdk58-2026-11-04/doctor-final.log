@@ -1,0 +1,25 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+expo-doctor: v1.21.6
+Running 20 checks on your project...
+✔ Check that local environment files are not committed
+✔ Check package.json for common issues
+✔ Check Expo config for common issues
+✔ Check for overridden dependencies
+✔ Check if the project meets version requirements for submission to app stores
+✔ Check for lock file
+✔ Check dependencies for packages that should not be installed directly
+✔ Check for app config fields that may not be synced in a non-CNG project
+✔ Check for issues with Metro config
+✔ Check npm/yarn versions
+✔ Check native tooling versions
+✔ Check for common project setup issues
+✔ Check that packages match versions required by installed Expo SDK
+✔ Check that native modules do not use incompatible support packages
+✔ Check that @expo/vector-icons package is not installed together with other potentially conflicting icon packages.
+✔ Check for legacy global CLI installed locally
+✔ Check Expo config (app.json/ app.config.js) schema
+✔ Check that required peer dependencies are installed
+✔ Check that no duplicate dependencies are installed
+✔ Validate packages against React Native Directory package metadata
+
+20/20 checks passed. No issues detected!

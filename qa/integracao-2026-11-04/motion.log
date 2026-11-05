@@ -1,0 +1,7 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> elas@1.1.0 test:loading
+> node tests/loading-motion.mjs && node tests/tab-transition.mjs
+
+Loading motion: lifecycle, stable loop, native/web driver, reduced motion, responsive art and accessibility passed.
+Route focus passed: Relatos → Mapa, all profile options and Back, progressive native intensity/web filter, rapid taps, cancellation, timeout, cleanup and reduced motion.

@@ -1,0 +1,58 @@
+{
+  "quantidades": [
+    {
+      "tipo": "avaliacao",
+      "quantidade": 20
+    },
+    {
+      "tipo": "evento",
+      "quantidade": 8
+    },
+    {
+      "tipo": "relato",
+      "quantidade": 6
+    }
+  ],
+  "locais": [
+    {
+      "nome": "Criciúma Shopping",
+      "id": "overture:52e7790c-14ed-4ddb-9e02-82ff0e8985f8",
+      "exemplos": 4,
+      "segura": 1,
+      "moderada": 3,
+      "cuidado": 0
+    },
+    {
+      "nome": "Parque das Nações",
+      "id": "osm:way:453621835",
+      "exemplos": 4,
+      "segura": 0,
+      "moderada": 1,
+      "cuidado": 3
+    },
+    {
+      "nome": "Praça do Congresso",
+      "id": "congresso",
+      "exemplos": 4,
+      "segura": 1,
+      "moderada": 3,
+      "cuidado": 0
+    },
+    {
+      "nome": "Praça Nereu Ramos",
+      "id": "nereu",
+      "exemplos": 4,
+      "segura": 3,
+      "moderada": 1,
+      "cuidado": 0
+    },
+    {
+      "nome": "Shopping Della",
+      "id": "osm:node:9478440538",
+      "exemplos": 4,
+      "segura": 3,
+      "moderada": 1,
+      "cuidado": 0
+    }
+  ]
+}

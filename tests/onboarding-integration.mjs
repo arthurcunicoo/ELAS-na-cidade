@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {getOnboardingStage,isOnboardingCompleted,openOnboardingTour,completeOnboarding,resetOnboarding,returnToWelcome,subscribeOnboardingStage,subscribeOnboardingState} from '../features/map/onboardingEvent.ts';
+const stages=[],completed=[];
+const stopStage=subscribeOnboardingStage(stage=>stages.push(stage)),stopState=subscribeOnboardingState(value=>completed.push(value));
+assert.equal(getOnboardingStage(),'welcome');assert.equal(isOnboardingCompleted(),true);
+openOnboardingTour();assert.equal(getOnboardingStage(),'tour');assert.equal(isOnboardingCompleted(),false);
+completeOnboarding();assert.equal(getOnboardingStage(),'auth');assert.equal(isOnboardingCompleted(),true);
+resetOnboarding();assert.equal(getOnboardingStage(),'tour');
+returnToWelcome();assert.equal(getOnboardingStage(),'welcome');assert.equal(isOnboardingCompleted(),true,'logout must return to welcome without forcing the tour');
+assert.deepEqual(stages,['tour','auth','tour','welcome']);assert.deepEqual(completed,[false,true,false,true]);
+stopStage();stopState();completeOnboarding();assert.equal(stages.length,4);assert.equal(completed.length,4);
+returnToWelcome();
+console.log('Onboarding integration passed: preserved welcome/tour/auth stages, optional tour, login completion, logout to welcome and listener cleanup.');

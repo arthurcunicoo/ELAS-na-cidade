@@ -1,0 +1,61 @@
+{
+  "base_sha256": "dc848bd6034fb1e9b61967865da6718288308441b227c5810b3ed689517f0744",
+  "expo_sdk": 58,
+  "npm_ci": "aprovado",
+  "suite_verify": "aprovada",
+  "bundles": [
+    "Android",
+    "iOS",
+    "Web"
+  ],
+  "auditoria_dos_estilos": {
+    "checks": [
+      {
+        "platform": "android",
+        "development": false,
+        "surfaces": 13,
+        "passed": true
+      },
+      {
+        "platform": "ios",
+        "development": false,
+        "surfaces": 13,
+        "passed": true
+      },
+      {
+        "platform": "web",
+        "development": false,
+        "surfaces": 13,
+        "passed": true
+      },
+      {
+        "platform": "android",
+        "development": true,
+        "surfaces": 13,
+        "passed": true
+      },
+      {
+        "platform": "ios",
+        "development": true,
+        "surfaces": 13,
+        "passed": true
+      },
+      {
+        "platform": "web",
+        "development": true,
+        "surfaces": 13,
+        "passed": true
+      }
+    ],
+    "method": "Estilos dos componentes com preset Expo por plataforma, em desenvolvimento e produção; sem teste físico."
+  },
+  "comparacao_web_antes_depois": {
+    "larguras": [
+      357,
+      320
+    ],
+    "estilos_e_dimensoes_identicos": true,
+    "ler_todas_funcionou": true
+  },
+  "validacao_visual_em_android_fisico": false
+}

@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-03",
+  "base": "Elas-main.zip",
+  "baseSha256": "9c329666d85014fbfff672333ec523612f251c21fc7931dbab71fc8ba40d704a",
+  "baseThemePreserved": true,
+  "baseArtworkPreserved": true,
+  "baseFormDesignPreserved": true,
+  "welcomeTemplate": true,
+  "automaticTour": false,
+  "threeMoods": [
+    "Segura",
+    "Moderada",
+    "Cuidado"
+  ],
+  "fictionalSamplesEnabled": false,
+  "publicMinimumApproved": 1,
+  "ownPendingOnlyForAuthor": true,
+  "backendMutationThisRequest": false,
+  "existingMigrationIncluded": "20261103122125_three_review_levels",
+  "liveLegacyAttentionRemaining": 0,
+  "emailAutoconfirm": true,
+  "cleanInstall": true,
+  "completeVerifyExitCode": 0,
+  "finalTypecheckExitCode": 0,
+  "finalLintWarnings": 0,
+  "exports": [
+    "android-hermes",
+    "ios-hermes",
+    "web"
+  ],
+  "realBrowserWelcomeViewports": [
+    [
+      357,
+      706
+    ],
+    [
+      320,
+      568
+    ]
+  ],
+  "realBrowserRuntimeErrors": 0,
+  "realBrowserStorageChecks": 12,
+  "physicalDeviceValidation": false,
+  "signedNativeBuild": false,
+  "absoluteBugFreeGuarantee": false
+}

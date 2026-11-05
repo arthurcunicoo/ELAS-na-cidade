@@ -1,0 +1,118 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+env: load .env
+env: export EXPO_PUBLIC_ACCOUNT_ERASURE_ENABLED EXPO_PUBLIC_DEMO EXPO_PUBLIC_MAP_TILE_ATTRIBUTION EXPO_PUBLIC_MAP_TILE_ATTRIBUTION_URL EXPO_PUBLIC_MAP_TILE_MAX_ZOOM EXPO_PUBLIC_MAP_TILE_MODE EXPO_PUBLIC_MAP_TILE_URL EXPO_PUBLIC_SENTRY_DSN EXPO_PUBLIC_SERVICE_TIMEZONE EXPO_PUBLIC_SHOWCASE EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY EXPO_PUBLIC_SUPABASE_URL
+Starting Metro Bundler
+
+| (node:18) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+| (Use `node --trace-warnings ...` to show where the warning was created)
+| (node:18) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+| (Use `node --trace-warnings ...` to show where the warning was created)
+ WARN  The package /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router contains an invalid package.json configuration. Consider raising this issue with the package maintainer(s).
+Reason: The resolution for "/workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store" defined in "exports" is /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store.js, however this file does not exist. Falling back to file-based resolution.
+ WARN  The package /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router contains an invalid package.json configuration. Consider raising this issue with the package maintainer(s).
+Reason: The resolution for "/workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store" defined in "exports" is /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store.js, however this file does not exist. Falling back to file-based resolution.
+ WARN  The package /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router contains an invalid package.json configuration. Consider raising this issue with the package maintainer(s).
+Reason: The resolution for "/workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store" defined in "exports" is /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store.js, however this file does not exist. Falling back to file-based resolution.
+ WARN  The package /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router contains an invalid package.json configuration. Consider raising this issue with the package maintainer(s).
+Reason: The resolution for "/workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store" defined in "exports" is /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store.js, however this file does not exist. Falling back to file-based resolution.
+ WARN  The package /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router contains an invalid package.json configuration. Consider raising this issue with the package maintainer(s).
+Reason: The resolution for "/workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store" defined in "exports" is /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store.js, however this file does not exist. Falling back to file-based resolution.
+ WARN  The package /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router contains an invalid package.json configuration. Consider raising this issue with the package maintainer(s).
+Reason: The resolution for "/workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store" defined in "exports" is /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store.js, however this file does not exist. Falling back to file-based resolution.
+ WARN  The package /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router contains an invalid package.json configuration. Consider raising this issue with the package maintainer(s).
+Reason: The resolution for "/workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store" defined in "exports" is /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store.js, however this file does not exist. Falling back to file-based resolution.
+ WARN  The package /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router contains an invalid package.json configuration. Consider raising this issue with the package maintainer(s).
+Reason: The resolution for "/workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store" defined in "exports" is /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store.js, however this file does not exist. Falling back to file-based resolution.
+ WARN  The package /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router contains an invalid package.json configuration. Consider raising this issue with the package maintainer(s).
+Reason: The resolution for "/workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store" defined in "exports" is /workspace/scratch/16bf12222e9b/merge-elas-main/Elas-main/node_modules/expo-router/build/global-state/router-store.js, however this file does not exist. Falling back to file-based resolution.
+Web Bundled 81303ms node_modules/expo-router/entry.js (2036 modules)
+iOS Bundled 104851ms node_modules/expo-router/entry.js (2468 modules)
+Android Bundled 129641ms node_modules/expo-router/entry.js (2477 modules)
+
+› Assets (63):
+assets/city-modern.ef3183477f5b05d071e421c70fd628a1.jpg (79KB)
+assets/city-modern.jpg (79KB)
+assets/places/congresso.5e5a6f751e286e4934a134ee36c4cdcb.jpg (100KB)
+assets/places/congresso.jpg (100KB)
+assets/places/nacoes.2992ea646d72766fe7e86dd9f475fa28.jpg (72KB)
+assets/places/nacoes.jpg (72KB)
+assets/places/nereu.b787ea51acdeecfa66a37490da6d09ea.jpg (68KB)
+assets/places/nereu.jpg (68KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.b4eb097d35f44ed943676fd56f6bdc51.ttf (390KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf (390KB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.6e435534bd35da5fef04168860a9b8fa.ttf (1.3MB)
+node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf (1.3MB)
+node_modules/expo-router/assets/arrow_down.017bc6ba3fc25503e5eb5e53826d48a8.png (9.5KB)
+node_modules/expo-router/assets/arrow_down.png (9.5KB)
+node_modules/expo-router/assets/arrow_right.xml (307B)
+node_modules/expo-router/assets/checkmark.xml (312B)
+node_modules/expo-router/assets/error.d1ea1496f9057eb392d5bbf3732a61b7.png (469B)
+node_modules/expo-router/assets/error.png (469B)
+node_modules/expo-router/assets/file.19eeb73b9593a38f8e9f418337fc7d10.png (138B)
+node_modules/expo-router/assets/file.png (138B)
+node_modules/expo-router/assets/forward.d8b800c443b8972542883e0b9de2bdc6.png (188B)
+node_modules/expo-router/assets/forward.png (188B)
+node_modules/expo-router/assets/pkg.ab19f4cbc543357183a20571f68380a3.png (364B)
+node_modules/expo-router/assets/pkg.png (364B)
+node_modules/expo-router/assets/react-navigation/elements/back-icon-mask.0a328cd9c1afd0afe8e3b1ec5165b1b4.png (653B)
+node_modules/expo-router/assets/react-navigation/elements/back-icon-mask.png (653B)
+node_modules/expo-router/assets/react-navigation/elements/back-icon.35ba0eaec5a4f5ed12ca16fabeae451d.png (207B)
+node_modules/expo-router/assets/react-navigation/elements/back-icon.png (8 variations | 359B)
+node_modules/expo-router/assets/react-navigation/elements/clear-icon.c94f6478e7ae0cdd9f15de1fcb9e5e55.png (4 variations | 425B)
+node_modules/expo-router/assets/react-navigation/elements/clear-icon.png (4 variations | 425B)
+node_modules/expo-router/assets/react-navigation/elements/close-icon.808e1b1b9b53114ec2838071a7e6daa7.png (4 variations | 235B)
+node_modules/expo-router/assets/react-navigation/elements/close-icon.png (4 variations | 235B)
+node_modules/expo-router/assets/react-navigation/elements/search-icon.286d67d3f74808a60a78d3ebf1a5fb57.png (928B)
+node_modules/expo-router/assets/react-navigation/elements/search-icon.png (7 variations | 592B)
+node_modules/expo-router/assets/sitemap.412dd9275b6b48ad28f5e3d81bb1f626.png (465B)
+node_modules/expo-router/assets/sitemap.png (465B)
+node_modules/expo-router/assets/unmatched.20e71bdf79e3a97bf55fd9e164041578.png (4.8KB)
+node_modules/expo-router/assets/unmatched.png (4.8KB)
+
+› web bundles (34):
+_expo/static/js/web/__common-a1b07c7ea84880ce38b2480834f29b19.js (2.5MB)
+_expo/static/js/web/__expo-metro-runtime-ed4c1cfa6193d76fc294130e42bd1916.js (3.9KB)
+_expo/static/js/web/_layout-f3a94e00c03e8d16661593cca35cf007.js (754KB)
+_expo/static/js/web/admin-equipe-b142b852daccc2b0b0b78b7c113e211a.js (5.3KB)
+_expo/static/js/web/admin-f27d76f01dd65f65fcd1fc48ffc2c987.js (11KB)
+_expo/static/js/web/admin-lugar-033fac83a49c1376fec43864ebc7c61e.js (3.4KB)
+_expo/static/js/web/admin-publicacoes-a1da40e8776c40f1e688989ecb23bc72.js (5.6KB)
+_expo/static/js/web/admin-publicar-4ab312e089138c07bc53251a3a8efb85.js (3.5KB)
+_expo/static/js/web/alertas-814094d0c6a50f9fe96b8195a26e3e70.js (9.4KB)
+_expo/static/js/web/avaliar-d727d4d10430547d059c691e6bcbbbc1.js (17KB)
+_expo/static/js/web/cadastro-f950447610c73bd0b4f8704daa66f747.js (617B)
+_expo/static/js/web/configuracoes-12b1b807d2a34c39503d35a3af63ab07.js (7.4KB)
+_expo/static/js/web/conquistas-1eb186eaf6da37b76f46ae258f8e07c1.js (3.6KB)
+_expo/static/js/web/diagnostico-b7ef900260833aed90a18180221313e8.js (1.3KB)
+_expo/static/js/web/entry-b2041b63e4a7ab44b814500e3479f6f2.js (1.1MB)
+_expo/static/js/web/eventos-6b7d61c41361850bf2570b6e8275ba60.js (20KB)
+_expo/static/js/web/favoritos-883bfb4917fb2f753e917284c5ed5765.js (1.8KB)
+_expo/static/js/web/foto-perfil-97d7ecfda950b0a0e1af1941f1e867ec.js (12KB)
+_expo/static/js/web/historico-impactos-e830f6d9b1e4e0427ab0d49728be7f73.js (2.7KB)
+_expo/static/js/web/impactos-12abd4c5a2197a1014f7531fa7a53def.js (20KB)
+_expo/static/js/web/index-2db1081f7f87e564d95e9f38175bda07.js (1.1KB)
+_expo/static/js/web/index-35ef8306555c73eb21bcba88be94b7da.js (60KB)
+_expo/static/js/web/informacoes-pessoais-7353f50f06cee994fbfad0b93996f560.js (3.5KB)
+_expo/static/js/web/login-ea28ba7986ec968563429f0756870295.js (602B)
+_expo/static/js/web/mapa-65d4be387659f961f833a7aa685552bf.js (92KB)
+_expo/static/js/web/meus-relatos-f0fdcda7d2ac764f9f28039f1b9866e4.js (621B)
+_expo/static/js/web/minhas-avaliacoes-aeaaf76b86f0d621d6e5805b947a6b52.js (4.7KB)
+_expo/static/js/web/minhas-solicitacoes-357e0d91d473ef1efa7a4f3a749f5188.js (623B)
+_expo/static/js/web/notificacoes-f1cc7d3a0dbd728b89ea369d93fa336e.js (5.4KB)
+_expo/static/js/web/novo-relato-2f4e0cb3cc8e4325ee746698d80fcb29.js (11KB)
+_expo/static/js/web/perfil-0d0f2d949565444bd4dc52ce13146b3a.js (13KB)
+_expo/static/js/web/recuperar-senha-b714932ea80b0e21fc2e113196161dab.js (5.8KB)
+_expo/static/js/web/registro-ec1d352517fbe9668b87b2527358c90a.js (4.9KB)
+_expo/static/js/web/relatos-area-671c37900055afe2c4cf160ac52626ee.js (2.6KB)
+
+› ios bundles (1):
+_expo/static/js/ios/entry-cffaba049e9adb99c2d086f6b5f46372.hbc (7.5MB)
+
+› android bundles (1):
+_expo/static/js/android/entry-41f06d352b265ee4564ef44d7514b3d4.hbc (7.5MB)
+
+› Files (2):
+index.html (1.4KB)
+metadata.json (4.1KB)
+
+Exported: /workspace/scratch/16bf12222e9b/sdk58-migration/export

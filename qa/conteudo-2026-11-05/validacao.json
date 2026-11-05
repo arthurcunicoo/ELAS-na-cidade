@@ -1,0 +1,15 @@
+{
+  "base_sha256": "d0ad7171cd06bf86df0a3a5bab9abf789a3b986ceefef389329a8518b99fc23e",
+  "expo_sdk": 58,
+  "npm_ci": "aprovado",
+  "suite_verify": "aprovada",
+  "exportacao": [
+    "Android",
+    "iOS",
+    "Web"
+  ],
+  "clique_em_marcador_nativo": "teste do componente, com host de mapa simulado",
+  "clique_em_marcador_web": "aplicativo Expo exportado, com API isolada e cinco lugares de apresentação",
+  "aparelho_fisico": "não executado neste ambiente",
+  "estilos_mapa_transicoes_e_dependencias_preservados": true
+}

@@ -1,0 +1,16 @@
+{
+  "base": "Elas-main.zip",
+  "import": "elas.zip",
+  "keep_new_main": [
+    "app/index.tsx",
+    "components/AuthScreen.tsx",
+    "components/OnboardingTour.tsx",
+    "features/map/onboardingEvent.ts"
+  ],
+  "manual_merge": {
+    "features/map/onboardingEvent.ts": "Keep welcome/tour/auth stage API and add returnToWelcome for logout.",
+    "app/perfil.tsx": "Retain shared transition; return logout to welcome rather than automatically opening tour."
+  },
+  "base_files": 500,
+  "base_files_removed": []
+}

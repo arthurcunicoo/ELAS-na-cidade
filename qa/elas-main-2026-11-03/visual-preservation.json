@@ -1,0 +1,14 @@
+{
+  "themePreserved": true,
+  "logoPreserved": true,
+  "cityBackdropPreserved": true,
+  "assetsPreserved": true,
+  "assetCount": 5,
+  "styleChanges": [
+    "app/index.tsx",
+    "components/map/PlaceReviewPreview.tsx",
+    "components/reviews/MoodSelector.tsx"
+  ],
+  "unrequestedStyleChanges": [],
+  "scope": "StyleSheet AST/asset bytes plus browser inspection; requested home, removed fourth mood and removed fictional review block are the intentional changes."
+}

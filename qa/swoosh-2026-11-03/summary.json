@@ -1,0 +1,62 @@
+{
+  "source": "Elas-main-atualizado-2026-11-03.zip",
+  "source_sha256": "6f5c83a4a5b6bcb318a9c58498f4cfdbef972d2c14b84eeebc4f74e9f8fd2207",
+  "base_files": 502,
+  "original_files_removed": [],
+  "changed": [
+    "APRESENTACAO-ELAS.md",
+    "README.md",
+    "app/_layout.tsx",
+    "constants/community.ts",
+    "features/map/CatalogProvider.tsx",
+    "features/map/MapScreen.tsx",
+    "features/reviews/ReviewForm.tsx",
+    "hooks/useReducedMotion.ts",
+    "package-lock.json",
+    "package.json",
+    "scripts/qa/run-welcome.mjs",
+    "services/reviews.ts",
+    "tests/admin-access.mjs",
+    "tests/map-stability.mjs",
+    "tests/production-flows.mjs",
+    "tests/request-cancellation.mjs"
+  ],
+  "added_before_report": [
+    "components/navigation/TabTransition.tsx",
+    "qa/swoosh-2026-11-03/expo-dependencies.log",
+    "qa/swoosh-2026-11-03/export.log",
+    "qa/swoosh-2026-11-03/lint.log",
+    "qa/swoosh-2026-11-03/map-stability.log",
+    "qa/swoosh-2026-11-03/production-flows.log",
+    "qa/swoosh-2026-11-03/tabs-browser-evidence.json",
+    "qa/swoosh-2026-11-03/tabs-browser.log",
+    "qa/swoosh-2026-11-03/transition.log",
+    "qa/swoosh-2026-11-03/verify.log",
+    "qa/swoosh-2026-11-03/welcome-browser.log",
+    "qa/swoosh-2026-11-03/welcome-evidence.json",
+    "tests/tab-browser.mjs",
+    "tests/tab-transition.mjs"
+  ],
+  "assets_theme_welcome_navigation_preserved": 9,
+  "checks": {
+    "npm_verify": "passed",
+    "lint_zero_warnings": "passed",
+    "expo_export_android_ios_web": "passed",
+    "dependency_compatibility_offline": "passed",
+    "browser_viewports": [
+      [
+        357,
+        706
+      ],
+      [
+        320,
+        568
+      ]
+    ],
+    "browser_backend": "isolated synthetic API fixtures; no production writes",
+    "browser_runtime_errors": 0,
+    "physical_device": "not tested",
+    "signed_apk_ipa": "not built"
+  },
+  "database_changes_this_update": false
+}

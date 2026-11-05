@@ -1,0 +1,6 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> elas@1.1.0 qa:expo-go
+> node scripts/qa/run-welcome.mjs tests/expo-go-compat.mjs
+
+{"expoVersion":"58.0.23","results":[{"platform":"android","sdkVersion":"58.0.0","runtimeVersion":"exposdk:58.0.0","launchBundle":true,"bundleBytes":14155788},{"platform":"ios","sdkVersion":"58.0.0","runtimeVersion":"exposdk:58.0.0","launchBundle":true,"bundleBytes":14163938}],"physicalDeviceTested":false}

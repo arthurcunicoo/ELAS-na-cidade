@@ -1,0 +1,6 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> elas@1.1.0 qa:tabs
+> node scripts/qa/run-welcome.mjs tests/tab-browser.mjs
+
+{"test":"Expo web UI with isolated API fixtures; no live writes","checks":[{"viewport":{"width":357,"height":706},"blur":true,"stableNavigation":true,"rapidTabs":true,"reducedMotion":true,"reviewSubmission":true,"classifications":["Seguro","Moderado","Cuidado"],"runtimeErrors":0},{"viewport":{"width":320,"height":568},"blur":true,"stableNavigation":true,"rapidTabs":true,"reducedMotion":true,"reviewSubmission":true,"classifications":["Seguro","Moderado","Cuidado"],"runtimeErrors":0}]}
