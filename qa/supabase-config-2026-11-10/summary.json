@@ -1,0 +1,32 @@
+{
+  "sdk": {
+    "expoVersion": "58.0.23",
+    "results": [
+      {
+        "platform": "android",
+        "sdkVersion": "58.0.0",
+        "runtimeVersion": "exposdk:58.0.0",
+        "launchBundle": true,
+        "bundleBytes": 14177943
+      },
+      {
+        "platform": "ios",
+        "sdkVersion": "58.0.0",
+        "runtimeVersion": "exposdk:58.0.0",
+        "launchBundle": true,
+        "bundleBytes": 14185883
+      }
+    ],
+    "physicalDeviceTested": false
+  },
+  "npmCi": "passed",
+  "verify": "passed",
+  "configurationCases": 28,
+  "browserWithoutEnv": "passed; fixture login requests used packaged ELAS configuration",
+  "realAuthSettings": {
+    "publishable": 200,
+    "anon": 200
+  },
+  "databaseWrites": 0,
+  "actualPasswordLoginTested": false
+}

@@ -1,4 +1,4 @@
-import { colors, fonts, glass, radius, surfaceShadow, typography } from "../constants/theme";
+import { colors, fonts, glass, radius, typography } from "../constants/theme";
 import { PageHeader } from "./shared/PageHeader";
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from "react-native";
 import Ionicons from "./icons/Ionicon";
@@ -98,13 +98,11 @@ const styles = StyleSheet.create({
     borderColor: glass.specularBorder,
     alignItems: "center",
     justifyContent: "center",
-    ...surfaceShadow({
-      shadowColor: colors.wine,
-      shadowOpacity: 0.18,
-      shadowRadius: 6,
-      shadowOffset: { width: 0, height: 2 },
-      elevation: 3,
-    }),
+    shadowColor: colors.wine,
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
   identity: {
     alignItems: "center",

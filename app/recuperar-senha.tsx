@@ -1,5 +1,5 @@
 import { createPasswordRecovery, requestPasswordRecovery } from "../services/account";
-import { pageContent, colors, glassAuthCard, typography } from "../constants/theme";
+import { pageContent, colors, formLayout, glassAuthCard, typography } from "../constants/theme";
 import { useEffect, useRef, useState } from "react";
 import { Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { router } from "expo-router";
@@ -170,6 +170,7 @@ export default function RecoverPassword() {
                   }
                   disabled={busy || cooldown > 0}
                   onPress={() => void requestCode()}
+                  style={styles.submit}
                 />
               </>
             )}
@@ -193,6 +194,7 @@ export default function RecoverPassword() {
                   title={busy ? "Verificando..." : "Verificar código"}
                   disabled={busy}
                   onPress={() => void checkCode()}
+                  style={styles.submit}
                 />
                 <TouchFeedback
                   disabled={busy || cooldown > 0}
@@ -250,6 +252,7 @@ export default function RecoverPassword() {
                   title={busy ? "Salvando..." : "Salvar senha"}
                   disabled={busy}
                   onPress={() => void changePassword()}
+                  style={styles.submit}
                 />
               </>
             )}
@@ -275,6 +278,7 @@ export default function RecoverPassword() {
 const styles = StyleSheet.create({
   root: { flex: 1 },
   body: { ...pageContent, ...glassAuthCard },
+  submit: { marginTop: formLayout.gap },
   title: {
     color: colors.white,
     fontSize: 26,

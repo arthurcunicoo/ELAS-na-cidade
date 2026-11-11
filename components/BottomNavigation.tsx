@@ -1,4 +1,4 @@
-import { colors, fonts, glass, palette, radius, surfaceShadow, typography } from "../constants/theme";
+import { colors, fonts, glass, palette, radius, typography } from "../constants/theme";
 import { type ComponentProps, useEffect, useRef } from "react";
 import { Animated, Platform, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -133,13 +133,11 @@ const styles = StyleSheet.create({
     borderTopRightRadius: radius.large,
     borderTopWidth: 1,
     borderTopColor: glass.specularBorder,
-    ...surfaceShadow({
-      shadowColor: palette.wine,
-      shadowOpacity: 0.1,
-      shadowRadius: 18,
-      shadowOffset: { width: 0, height: -4 },
-      elevation: 8,
-    }),
+    shadowColor: palette.wine,
+    shadowOpacity: 0.1,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: -4 },
+    elevation: 8,
   },
   item: {
     flex: 1,

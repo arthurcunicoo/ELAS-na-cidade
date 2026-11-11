@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { cardShadow, colors, fonts, glass, glassPanel, glassShadow, palette, radius, surfaceShadow, typography } from "../../constants/theme";
+import { cardShadow, colors, fonts, glass, glassPanel, glassShadow, palette, radius, typography } from "../../constants/theme";
 export const styles = StyleSheet.create({
   feedback: { position: "absolute", top: "100%", left: 0, right: 0 },
   loadingChip: {
@@ -107,13 +107,8 @@ export const styles = StyleSheet.create({
   focused: {
     backgroundColor: palette.focusSurface,
     borderColor: colors.pink,
-    ...surfaceShadow({
-      shadowColor: palette.wine,
-      shadowOpacity: 0.22,
-      shadowRadius: 22,
-      shadowOffset: { width: 0, height: 8 },
-      elevation: 6,
-    }),
+    shadowOpacity: 0.22,
+    elevation: 6,
   },
   input: {
     flex: 1,

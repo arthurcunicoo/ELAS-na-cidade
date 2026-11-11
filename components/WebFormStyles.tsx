@@ -82,6 +82,11 @@ export const WebFormStyles = memo(function WebFormStyles() {
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
     }
+    /* The scene is already defocused during the swoosh. Skip extra blur passes. */
+    [data-elas-motion="active"] div[style*="rgba("] {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
 
     /* Compositor-only Apple Liquid Glass button physics without overflowing parent bounds */
     [role="button"], [role="tab"], [role="link"], [role="radio"], [role="checkbox"] {
@@ -112,6 +117,11 @@ export const WebFormStyles = memo(function WebFormStyles() {
       box-shadow:
         inset 0 2px 5px 0 rgba(255, 255, 255, 0.85),
         0 2px 8px -2px rgba(189, 28, 81, 0.22) !important;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      [role="button"], [role="tab"], [role="link"], [role="radio"], [role="checkbox"] {
+        transition: none !important;
+      }
     }
   `,
   );

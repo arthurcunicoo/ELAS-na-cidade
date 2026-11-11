@@ -32,13 +32,15 @@ await reviews.listOwnReviews('owner',null);
 assert.deepEqual(calls[0], ['rpc','pagina_app',{p_lista:'avaliacoes',p_cursor:null,p_filtros:{}}]);
 result = { data: null, error: null };
 await assert.rejects(reviews.removeOwnReview('review','owner'), /indisponível/);
-result = { data: null, error: Error('RLS denied') };
-await assert.rejects(reviews.readOwnReview('place','owner'), /RLS denied/);
 result = { data: [], error: null };
 calls.length = 0;await reviews.listReviewFactors();
 assert.deepEqual(calls[0], ['from','fatores']);assert.ok(calls.some(call => call[0] === 'order' && call[1] === 'ordem'));
-await reviews.saveReview('place','Segura',' comment ',['factor']);
-assert.deepEqual(calls.at(-1), ['rpc','salvar_avaliacao',{ p_lugar:'place',p_sentimento:'Segura',p_comentario:'comment',p_fatores:['factor'] }]);
+const review = {placeId:'place',mood:'Segura',comment:' comment ',factors:['factor']};
+await reviews.createReview(review,'submission');
+assert.deepEqual(calls.at(-1), ['rpc','criar_avaliacao',{ p_chave:'submission',p_lugar:'place',p_sentimento:'Segura',p_comentario:'comment',p_fatores:['factor'] }]);
+result = { data: null, error: Error('New RPC unavailable') };
+await assert.rejects(reviews.createReview(review,'submission'), /New RPC unavailable/);
+assert.ok(!calls.some(call=>call[0]==='rpc'&&call[1]==='salvar_avaliacao'),'never fall back to the old overwrite API on an unmigrated server');
 
 // Password verification uses an isolated client and always closes it, including failure.
 let verifiedUser = 'wrong', appUpdates = 0, checkerClosed = 0, recoveryUpdates = 0;

@@ -3,7 +3,7 @@ import { useCallback, useRef, useState } from "react";
 import { Text, View } from "react-native";
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import { router } from "../lib/navigation";
-import { FeaturePage, Action, Field, Message, shared } from "../components/shared/FeaturePage";
+import { FeaturePage, Action, Message, shared } from "../components/shared/FeaturePage";
 import { recordDetail, updateRecord, RecordDetail, statusLabels } from "../features/reports/records";
 import { HistoryList } from "../features/reports/HistoryList";
 import { friendlyError } from "../lib/supabase";
@@ -14,10 +14,7 @@ export default function RecordScreen() {
   const [row, setRow] = useState<RecordDetail | null>(null),
     [loading, setLoading] = useState(true),
     [error, setError] = useState(""),
-    [edit, setEdit] = useState(false),
     [confirm, setConfirm] = useState(false),
-    [title, setTitle] = useState(""),
-    [text, setText] = useState(""),
     [busy, setBusy] = useState(false),
     [version, setVersion] = useState(0);
   const lock = useRef(false);
@@ -37,8 +34,6 @@ export default function RecordScreen() {
         .then((value) => {
           if (active) {
             setRow(value);
-            setTitle(value?.titulo ?? "");
-            setText(value?.descricao ?? "");
           }
         })
         .catch((e) => {
@@ -52,17 +47,9 @@ export default function RecordScreen() {
       };
     }, [kind, id, valid, version]),
   );
-  async function save(withdraw: boolean) {
+  async function withdraw() {
     if (!row || lock.current || (kind !== "relato" && kind !== "melhoria"))
       return;
-    if (
-      !withdraw &&
-      (text.trim().length < (kind === "relato" ? 10 : 5) ||
-        (kind === "melhoria" && title.trim().length < 3))
-    ) {
-      setError("Preencha o título e a descrição com mais detalhes.");
-      return;
-    }
     lock.current = true;
     setBusy(true);
     setError("");
@@ -70,10 +57,9 @@ export default function RecordScreen() {
       await updateRecord(
         kind,
         row,
-        { descricao: text.trim(), titulo: title.trim() },
-        withdraw,
+        { descricao: row.descricao, titulo: row.titulo },
+        true,
       );
-      setEdit(false);
       setConfirm(false);
       setVersion((v) => v + 1);
     } catch (e) {
@@ -85,6 +71,7 @@ export default function RecordScreen() {
   }
   const pending =
     row?.proprio && (row.status === "pendente" || row.status === "solicitada");
+  const canWithdraw = pending && (kind === "relato" || kind === "melhoria");
   return (
     <FeaturePage
       title={
@@ -126,7 +113,9 @@ export default function RecordScreen() {
             <Text style={shared.note}>
               {kind === "relato"
                 ? "Seu relato · aguardando verificação"
-                : "Sua solicitação · aguardando análise"}
+                : kind === "melhoria"
+                  ? "Sua solicitação · aguardando análise"
+                  : "Sua avaliação · aguardando análise"}
               . Visível apenas para você e para a equipe, ainda não publicado
               para a cidade.
             </Text>
@@ -153,62 +142,7 @@ export default function RecordScreen() {
               }
             />
           )}
-          {kind === "avaliacao" && row.lugar_id && (
-            <Action
-              title="Editar avaliação"
-              onPress={() =>
-                router.push({
-                  pathname: "/avaliar",
-                  params: { placeId: row.lugar_id! },
-                })
-              }
-            />
-          )}
-          {pending && !edit && (
-            <Action
-              secondary
-              title="Corrigir meu registro"
-              busy={busy}
-              onPress={() => setEdit(true)}
-            />
-          )}
-          {edit && (
-            <>
-              <Text style={shared.note}>
-                Você pode corrigir o texto enquanto o registro aguarda análise.
-                O local vinculado permanece o mesmo.
-              </Text>
-              {kind === "melhoria" && (
-                <Field
-                  label="Título"
-                  value={title}
-                  onChangeText={setTitle}
-                  editable={!busy}
-                  maxLength={100}
-                />
-              )}
-              <Field
-                label="Descrição"
-                value={text}
-                onChangeText={setText}
-                editable={!busy}
-                multiline
-                maxLength={1000}
-              />
-              <Action
-                title="Salvar correção"
-                busy={busy}
-                onPress={() => void save(false)}
-              />
-              <Action
-                secondary
-                title="Cancelar edição"
-                busy={busy}
-                onPress={() => setEdit(false)}
-              />
-            </>
-          )}
-          {pending && !edit && (
+          {canWithdraw && (
             <Action
               secondary
               title="Retirar meu registro"
@@ -216,7 +150,7 @@ export default function RecordScreen() {
               onPress={() => setConfirm(true)}
             />
           )}
-          {confirm && (
+          {canWithdraw && confirm && (
             <>
               <Text style={shared.note}>
                 Retirar este registro? O histórico será preservado e ele sairá
@@ -225,7 +159,7 @@ export default function RecordScreen() {
               <Action
                 title="Confirmar retirada"
                 busy={busy}
-                onPress={() => void save(true)}
+                onPress={() => void withdraw()}
               />
               <Action
                 secondary

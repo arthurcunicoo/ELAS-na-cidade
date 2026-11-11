@@ -83,9 +83,9 @@ export default function MyReviews() {
               Minhas avaliações
             </Text>
             <Text style={styles.text}>
-              Uma avaliação por lugar. Avaliar novamente atualiza sua avaliação
-              daquele lugar. Após aprovação, a percepção entra no resumo
-              coletivo. Comentários e autoria ficam privados.
+              Cada avaliação enviada fica registrada como foi escrita. Se você
+              avaliar o mesmo lugar de novo, verá as duas aqui. Comentários e
+              autoria ficam privados.
             </Text>
             {!!(error || (list.rows.length ? list.error : "")) && (
               <Text accessibilityRole="alert" style={styles.text}>
@@ -117,18 +117,6 @@ export default function MyReviews() {
             <Text style={styles.text}>
               {item.comentario || "Sem comentário."}
             </Text>
-            <TouchFeedback
-              disabled={!!deleting}
-              label="Editar avaliação"
-              onPress={() =>
-                router.push({
-                  pathname: "/avaliar",
-                  params: { placeId: item.lugar_id },
-                })
-              }
-            >
-              <Text style={styles.action}>Editar avaliação</Text>
-            </TouchFeedback>
             {confirm === item.id ? (
               <>
                 <Text style={styles.text}>Excluir esta avaliação?</Text>

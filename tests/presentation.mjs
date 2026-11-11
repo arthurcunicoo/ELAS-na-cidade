@@ -18,8 +18,8 @@ assert.deepEqual(demonstrationPolls([row('enquete',{},'invalid')],false),[]);
 const reports=demonstrationReports([row('relato',{categoria:'Iluminação'})]);assert.equal(reports[0].demonstracao,true);assert.equal(reports[0].status,'pendente');
 assert.deepEqual(demonstrationImpactCounts([{estado:'solicitada'},{estado:'concluida'},{estado:'em_andamento'},{estado:'unknown'}]),{solicitada:1,em_andamento:1,concluida:1});
 const source=ts.transpileModule(fs.readFileSync('lib/appMode.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
-for(const [environment,flag,expected] of [['production','1',false],['development','1',false],['presentation','0',false],['presentation','1',true]]){
- const module={exports:{}};new Function('exports','module','process',source)(module.exports,module,{env:{EXPO_PUBLIC_APP_ENV:environment,EXPO_PUBLIC_SHOWCASE:flag}});assert.equal(module.exports.showcaseEnabled,expected);
+for(const [dev,env,expected] of [[false,{EXPO_PUBLIC_SHOWCASE:'1',EXPO_PUBLIC_APP_ENV:'production'},false],[false,{EXPO_PUBLIC_SHOWCASE:'1',EXPO_PUBLIC_APP_ENV:'presentation'},false],[true,{EXPO_PUBLIC_SHOWCASE:'1'},false],[true,{EXPO_PUBLIC_SHOWCASE:'0'},false]]){
+ const module={exports:{}};new Function('exports','module','process','__DEV__',source)(module.exports,module,{env},dev);assert.equal(module.exports.showcaseEnabled,expected);
 }
 const code=ts.transpileModule(fs.readFileSync('features/community/community.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
 let calls=0;const module={exports:{}};

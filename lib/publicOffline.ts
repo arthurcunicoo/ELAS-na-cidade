@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Place } from "../constants/places";
+import { backendConfig } from "./backendConfig";
 export type OfflinePlace = Pick<
   Place,
   "id" | "name" | "address" | "latitude" | "longitude"
@@ -93,5 +94,5 @@ export function createPublicOfflineStore(
 }
 export const publicOfflineStore = createPublicOfflineStore(
   AsyncStorage,
-  process.env.EXPO_PUBLIC_SUPABASE_URL ?? "demo",
+  backendConfig.url || "demo",
 );

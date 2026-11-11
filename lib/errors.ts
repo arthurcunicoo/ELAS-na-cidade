@@ -56,6 +56,8 @@ export function friendlyError(error: unknown): string {
     return "Muitas tentativas. Aguarde um pouco e tente novamente.";
   if (code === "user_already_exists")
     return "Verifique seu e-mail ou tente entrar na sua conta.";
+  if (/invalid api key|invalid apikey|no api key found/i.test(message ?? ""))
+    return "A chave pública do Supabase não foi aceita. Confira se a URL e a chave são do mesmo projeto e reinicie o Expo após atualizar o .env.";
   const status = (error as { status?: number })?.status;
   const name = (error as { name?: string })?.name;
   if (typeof status === "number" && status >= 500 && status <= 599)

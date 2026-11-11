@@ -23,7 +23,7 @@ await protectedStore.getItem('legacy-fail');assert.ok(!rawData.get('legacy-fail'
 await protectedStore.setItem('missing-key','keep ciphertext');const missing=rawData.get('missing-key');keyData.delete('missing-key');await assert.rejects(protectedStore.getItem('missing-key'));await assert.rejects(protectedStore.setItem('missing-key','overwrite'));assert.equal(rawData.get('missing-key'),missing);
 await Promise.all([protectedStore.setItem('ordered','one'),protectedStore.setItem('ordered','two'),protectedStore.removeItem('ordered')]);assert.equal(rawData.has('ordered'),false);assert.equal(keyData.has('ordered'),false);
 const code=ts.transpileModule(fs.readFileSync(new URL('../lib/publicOffline.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,module={exports:{}};
-new Function('require','module','exports',code)(name=>name==='@react-native-async-storage/async-storage'?{default:raw}:require(name),module,module.exports);
+new Function('require','module','exports',code)(name=>name==='@react-native-async-storage/async-storage'?{default:raw}:name==='./backendConfig'?{backendConfig:{url:'https://fixture.supabase.co'}}:require(name),module,module.exports);
 const offline=module.exports.createPublicOfflineStore(raw,'fixture');
 await offline.save('a',[{id:'x',name:'Biblioteca',address:'Centro',latitude:1,longitude:2,description:'PRIVATE',reviewSummary:{privateComment:'SECRET'}}]);
 const cache=await offline.read('a');assert.deepEqual(Object.keys(cache.rows[0]).sort(),['address','id','latitude','longitude','name']);assert.equal(await offline.read('b'),null);

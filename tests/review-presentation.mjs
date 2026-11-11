@@ -34,7 +34,7 @@ for (const [environment, flag, enabled] of [['production', '1', false], ['stagin
   const module = { exports: {} };
   new Function('module', 'exports', 'process', source)(module, module.exports, { env: { EXPO_PUBLIC_APP_ENV: environment, EXPO_PUBLIC_REVIEW_EXAMPLES: flag } });
   assert.equal(module.exports.reviewExamplesEnabled, enabled);
-  assert.equal(module.exports.showcaseEnabled, false, 'review examples alone do not enable the other samples');
+  assert.equal(module.exports.showcaseEnabled, false, 'other sample features stay disabled');
 }
 
 // Real service: production opt-out, scoped/limited reads, AbortSignal, validation.

@@ -33,10 +33,10 @@ try {
  assert.equal((await db.query("select jsonb_array_length(public.resumos_avaliacoes(array['nereu','nereu','missing'])) n")).rows[0].n,1,'duplicate and missing place IDs are bounded safely');
  // Change policy in a rolled-back fixture: aggregate and explanation must follow together.
  const compact=(await db.query("select public.resumos_avaliacoes(array['nereu'],true) data")).rows[0].data;
- assert.equal(compact.politica.versao,2);assert.equal(compact.resumos.length,1);assert.ok(!('politica' in compact.resumos[0]));assert.equal(compact.resumos[0].classificacao,data.classificacao);
+ assert.equal(compact.politica.versao,3);assert.equal(compact.resumos.length,1);assert.ok(!('politica' in compact.resumos[0]));assert.equal(compact.resumos[0].classificacao,data.classificacao);
  assert.deepEqual((await db.query("select public.resumos_avaliacoes(array['nereu'],false) data")).rows[0].data[0],data);
  assert.deepEqual((await db.query("select public.resumos_avaliacoes(array[]::text[],true) data")).rows[0].data,{politica:null,resumos:[]});
- assert.equal(data.classificacao,'safe');assert.equal(data.politica.versao,2);assert.ok(data.politica.metodo.includes('70%'));
+ assert.equal(data.classificacao,'safe');assert.equal(data.politica.versao,3);assert.ok(data.politica.metodo.includes('70%'));
  await denied('select * from private.politica_avaliacoes');
  await denied("update private.politica_avaliacoes set minimo=8");
  await db.exec('reset role;begin;savepoint policy');
@@ -50,15 +50,26 @@ try {
  await db.exec('reset role');await db.query("update public.avaliacoes set contribuida_em=now()-interval '100 days' where id=$1",[first]);await asUser(G);data=await summary();assert.equal(data.total,7);assert.equal(data.distribuicao,null);assert.equal(data.classificacao,'unknown');
  await db.exec('rollback to policy;rollback');
  await asUser(A);await denied("update public.avaliacoes set contribuida_em=now()+interval '5 days'");
- await review(A,'Cuidado');await asUser(G);assert.equal((await summary()).total,4,'editing an approved review removes it until approval');
- await moderate(first,'pendente','aprovada');await asUser(G);assert.equal((await summary()).total,5);
+ const newer=await review(A,'Cuidado');
+ const myReviews=(await db.query("select public.pagina_app('avaliacoes',null,'{}'::jsonb) data")).rows[0].data.rows;
+ assert.deepEqual(myReviews.map(r=>[r.id,r.sentimento,r.status]),[[newer,'Cuidado','pendente'],[first,'Segura','aprovada']],'the private history retains both submissions with their own moderation states');
+ assert.deepEqual((await summary()).propria,{sentimento:'Cuidado',status:'pendente'},'own indicator uses the latest submission even with multiple records');
+ await asUser(G);data=await summary();
+ assert.equal(data.total,5,'new pending review leaves the previous approved contribution in place');
+ assert.deepEqual(data.distribuicao,{Segura:4,Moderada:0,Cuidado:1});
+ assert.equal(data.propria,null,'other users cannot see the pending submission');
+ await moderate(newer,'pendente','aprovada');await asUser(G);data=await summary();
+ assert.equal(data.total,5,'two approved reviews from the same account count once');
+ assert.deepEqual(data.distribuicao,{Segura:3,Moderada:0,Cuidado:2},'newest approved review determines the contribution');
+ await moderate(newer,'aprovada','rejeitada');await asUser(G);data=await summary();
+ assert.deepEqual(data.distribuicao,{Segura:4,Moderada:0,Cuidado:1},'previous approved review can count again after rejection of the newer one');
  await moderate(reviewed[1],'aprovada','rejeitada');await asUser(G);assert.equal((await summary()).total,4,'rejection takes effect without a rebuild');
  await asUser(C);await db.query('delete from public.avaliacoes where id=$1',[reviewed[2]]);await asUser(G);assert.equal((await summary()).total,3,'author withdrawal removes the contribution');
  const old=await review(F);await db.exec('reset role');await db.query("update public.avaliacoes set contribuida_em=now()-interval '181 days' where id=$1",[old]);
  const contributed=(await db.query('select contribuida_em from public.avaliacoes where id=$1',[old])).rows[0].contribuida_em;
  await moderate(old,'pendente','aprovada');await db.exec('reset role');assert.deepEqual((await db.query('select contribuida_em from public.avaliacoes where id=$1',[old])).rows[0].contribuida_em,contributed,'moderation must not make an old experience recent');
  await asUser(G);assert.equal((await summary()).total,3,'expired contribution remains excluded after moderation');
- await review(F,'Moderada');await moderate(old,'pendente','aprovada');await asUser(G);assert.equal((await summary()).total,4,'author revision renews the contribution window');
+ const fresh=await review(F,'Moderada');await moderate(fresh,'pendente','aprovada');await asUser(G);assert.equal((await summary()).total,4,'a new approved submission contributes even when a previous one has expired');
  await asUser(A);const request='10000000-0000-0000-0000-000000000001';await db.query("select public.enviar_registro('melhoria',$1,'{\"titulo\":\"Iluminação\",\"descricao\":\"Mais pontos de iluminação\"}'::jsonb)",[request]);
  let impacts=(await db.query('select public.resumo_impactos() data')).rows[0].data;assert.equal(impacts.counts.solicitada,1);assert.equal(impacts.rows.length,1);
  await asUser(B);impacts=(await db.query('select public.resumo_impactos() data')).rows[0].data;assert.equal(impacts.counts.solicitada,0);assert.equal(impacts.rows.length,0,'impact counts and rows must use the same RLS visibility');
@@ -118,5 +129,5 @@ try {
  await asUser(C);voted=(await readPoll(false)).rows.find(r=>r.id===open);assert.equal(voted.minha_opcao,null);assert.equal(voted.resultados_visiveis,true);assert.equal(voted.opcoes[0].votos,2);
  console.log('Product scope checks passed: private/personal/public counters, independent city totals, bounded rows, no pending author leaks, public-only report feed, private own records, neutral poll projections in cursor and legacy APIs, vote/change/end lifecycle and no direct aggregate bypass.');
 
- console.log('Community database checks passed: auth bounds, pending/approved/edited/rejected/withdrawn/expired/revised lifecycle, one-approved classification/configurable policy, hidden comments/authors, moderation preserves experience date, live aggregates and one RLS-consistent impact snapshot.');
+ console.log('Community database checks passed: auth bounds, append-only review history, latest approved submission per account, rejection/withdrawal/expiry, configurable policy, private comments/authors, moderation preserves experience date, live aggregates and one RLS-consistent impact snapshot.');
 } finally {await db.close();}

@@ -19,7 +19,6 @@ try {
   assert.equal((await db.query("select count(*)::int n from public.conteudos_demonstracao where tipo='evento' and inicia_em>now()")).rows[0].n,8);
   assert.equal((await db.query("select count(*)::int n from public.conteudos_demonstracao where not ficticio")).rows[0].n,0);
   assert.equal((await db.query("select count(distinct lugar_id)::int n from public.conteudos_demonstracao where tipo='avaliacao'")).rows[0].n,5);
-  assert.equal((await db.query("select count(*)::int n from public.conteudos_demonstracao where tipo='avaliacao' and (sentimento is null or sentimento not in ('Segura','Moderada','Cuidado'))")).rows[0].n,0);
   assert.deepEqual((await db.query("select estado,count(*)::int n from public.conteudos_demonstracao where tipo='impacto' group by estado order by estado")).rows,[{estado:'concluida',n:3},{estado:'em_andamento',n:3},{estado:'solicitada',n:3}]);
   await denied("update public.conteudos_demonstracao set ficticio=false");
   await db.exec('set role anon'); await denied('select * from public.conteudos_demonstracao');

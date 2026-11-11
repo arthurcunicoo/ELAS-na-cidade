@@ -1,5 +1,5 @@
 import { LoadingIndicator } from "../../components/loading/LoadingIndicator";
-import { readOwnReview, saveReview } from "../../services/reviews";
+import { createReview } from "../../services/reviews";
 import { ui, palette, radius, typography, pageContent } from "../../constants/theme";
 import { Field } from "../../components/shared/FormControls";
 import { PrimaryButton } from "../../components/shared/Buttons";
@@ -17,11 +17,9 @@ import { useDraft } from "../reports/drafts";
 import { DraftGuard } from "../../components/DraftGuard";
 import { ProfileDialog, ProfileNotice } from "../../components/ProfileDialog";
 import type { Place } from "../../constants/places";
-import { useSession } from "../auth/SessionProvider";
 import { useCatalog } from "../map/CatalogProvider";
 import { backendConfigured, friendlyError } from "../../lib/supabase";
 export function ReviewForm({ placeId }: { placeId: string }) {
-  const { session } = useSession();
   const {
     places,
     factors,
@@ -34,16 +32,13 @@ export function ReviewForm({ placeId }: { placeId: string }) {
   const insets = useSafeAreaInsets();
   const [loadedPlace, setLoadedPlace] = useState<Place | null>(null);
   const place = places.find((item) => item.id === placeId) ?? loadedPlace;
-  const draft = useDraft(`avaliacao:${placeId}`, {
+  // Drafts from the old edit form could contain an already submitted review.
+  const draft = useDraft(`nova-avaliacao:${placeId}`, {
     mood: "",
     selected: [] as string[],
     comment: "",
   });
-  const {
-    ready: draftReady,
-    restored: draftRestored,
-    setValue: setDraftValue,
-  } = draft;
+  const { ready: draftReady } = draft;
   const mood = draft.value.mood === "Atenção" ? "Cuidado" : draft.value.mood || null,
     selected = draft.value.selected,
     comment = draft.value.comment;
@@ -53,19 +48,16 @@ export function ReviewForm({ placeId }: { placeId: string }) {
     draft.setValue((v) => ({ ...v, comment }));
   const setSelected = (update: (current: string[]) => string[]) =>
     draft.setValue((v) => ({ ...v, selected: update(v.selected) }));
-  const [existing, setExisting] = useState(false),
-    [baseline, setBaseline] = useState(""),
-    [notice, setNotice] = useState<ProfileNotice | null>(null);
+  const [notice, setNotice] = useState<ProfileNotice | null>(null);
   const [error, setError] = useState("");
   const [state, setState] = useState<"idle" | "loading" | "done">("idle");
-  const active = useRef(false),
-    initialized = useRef(false);
+  const active = useRef(false);
   const [initialLoading, setInitialLoading] = useState(backendConfigured);
   const [loadFailed, setLoadFailed] = useState(false);
   const [retry, setRetry] = useState(0);
   const busy = useRef(false);
   const unsaved =
-    draft.ready && !initialLoading && baseline !== JSON.stringify(draft.value);
+    draftReady && (!!mood || selected.length > 0 || comment.length > 0);
   useFocusEffect(
     useCallback(() => {
       void ensureFactors();
@@ -74,34 +66,18 @@ export function ReviewForm({ placeId }: { placeId: string }) {
   useFocusEffect(
     useCallback(() => {
       void retry;
-      if (!draftReady) return;
       active.current = true;
       let current = true;
       const controller = new AbortController();
-      if (backendConfigured && placeId) {
+      if (backendConfigured) {
         setInitialLoading(true);
         setLoadFailed(false);
         setError("");
         (async () => {
           try {
-            const [resolvedPlace, data] = await Promise.all([
-              ensurePlace(placeId, controller.signal),
-              readOwnReview(placeId, session?.user.id ?? "", controller.signal),
-            ]);
+            const resolvedPlace = await ensurePlace(placeId, controller.signal);
             if (!resolvedPlace) throw new Error("place_unavailable");
-            if (current) {
-              const saved = {
-                mood: data?.sentimento ?? "",
-                selected:
-                  data?.avaliacao_fatores.map((item) => item.fator_id) ?? [],
-                comment: data?.comentario ?? "",
-              };
-              setLoadedPlace(resolvedPlace);
-              setExisting(!!data);
-              setBaseline(JSON.stringify(saved));
-              if (!draftRestored && !initialized.current) setDraftValue(saved);
-              initialized.current = true;
-            }
+            if (current) setLoadedPlace(resolvedPlace);
           } catch (e) {
             if (current) {
               setError(
@@ -121,18 +97,10 @@ export function ReviewForm({ placeId }: { placeId: string }) {
         active.current = false;
         controller.abort();
       };
-    }, [
-      placeId,
-      retry,
-      session?.user.id,
-      ensurePlace,
-      draftReady,
-      draftRestored,
-      setDraftValue,
-    ]),
+    }, [placeId, retry, ensurePlace]),
   );
   async function send() {
-    if (busy.current || initialLoading || loadFailed || !draft.ready) return;
+    if (busy.current || initialLoading || loadFailed || !draftReady) return;
     if (!place) {
       setError("Escolha um lugar válido antes de avaliar.");
       return;
@@ -147,8 +115,15 @@ export function ReviewForm({ placeId }: { placeId: string }) {
     setState("loading");
     try {
       if (backendConfigured) {
-        await saveReview(place.id, mood, comment, selected);
-        if (active.current) await ensurePlace(place.id).catch(() => null);
+        const payload = {
+          placeId: place.id,
+          mood,
+          comment: comment.trim(),
+          factors: [...selected].sort(),
+        };
+        const submissionId = await draft.prepare(payload);
+        await createReview(payload, submissionId);
+        if (active.current) void ensurePlace(place.id).catch(() => null);
       }
       if (active.current) setState("done");
       await draft.clear();
@@ -171,7 +146,7 @@ export function ReviewForm({ placeId }: { placeId: string }) {
     >
       <View style={styles.page}>
         <DraftGuard
-        onSave={draft.flush}
+          onSave={draft.flush}
           saved={!draft.error}
           enabled={unsaved && state === "idle"}
         />
@@ -228,7 +203,7 @@ export function ReviewForm({ placeId }: { placeId: string }) {
               )}
               <TouchFeedback
                 label="Trocar lugar da avaliação"
-                disabled={state !== "idle"}
+                disabled={state !== "idle" || !draftReady}
                 onPress={() => {
                   const change = () => {
                     void draft
@@ -250,9 +225,8 @@ export function ReviewForm({ placeId }: { placeId: string }) {
               </TouchFeedback>
             </View>
             <Text style={styles.note}>
-              {existing
-                ? "Você já avaliou este lugar. Enviar novamente atualiza sua avaliação."
-                : "Esta avaliação será vinculada ao lugar selecionado."}
+              Esta avaliação será vinculada ao lugar selecionado. Depois de
+              enviar, você pode fazer uma nova, mas não pode alterar esta.
             </Text>
             <Text style={styles.helper}>
               Após aprovação, sua percepção entra no resumo coletivo do lugar.
@@ -269,7 +243,11 @@ export function ReviewForm({ placeId }: { placeId: string }) {
               </Text>
               <MoodSelector
                 disabled={
-                  state !== "idle" || initialLoading || loadFailed || !place
+                  state !== "idle" ||
+                  !draftReady ||
+                  initialLoading ||
+                  loadFailed ||
+                  !place
                 }
                 value={mood}
                 onChange={(value) => {
@@ -292,7 +270,9 @@ export function ReviewForm({ placeId }: { placeId: string }) {
                     label={nome}
                     role="checkbox"
                     checked={selected.includes(factor)}
-                    disabled={state !== "idle" || initialLoading || loadFailed}
+                    disabled={
+                      state !== "idle" || !draftReady || initialLoading || loadFailed
+                    }
                     onPress={() => {
                       setSelected((current) =>
                         current.includes(factor)
@@ -325,17 +305,14 @@ export function ReviewForm({ placeId }: { placeId: string }) {
                 accessibilityLabel="Comentário opcional"
                 value={comment}
                 onChangeText={setComment}
-                editable={state === "idle" && !initialLoading && !loadFailed}
+                editable={state === "idle" && draftReady && !initialLoading && !loadFailed}
                 multiline
                 maxLength={1000}
                 placeholder="Escreva algo sobre sua experiência..."
               />
-              {initialLoading && (
-                <LoadingIndicator label="Carregando sua avaliação" />
-              )}
               {loadFailed && (
                 <TouchFeedback
-                  label="Recarregar avaliação"
+                  label="Recarregar local"
                   onPress={() => setRetry((value) => value + 1)}
                 >
                   <Text style={styles.error}>Tentar carregar novamente</Text>
@@ -350,6 +327,7 @@ export function ReviewForm({ placeId }: { placeId: string }) {
                 title="Avaliar lugar"
                 disabled={
                   state !== "idle" ||
+                  !draftReady ||
                   initialLoading ||
                   loadFailed ||
                   !place ||

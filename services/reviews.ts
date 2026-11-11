@@ -11,25 +11,19 @@ export async function listReviewFactors(): Promise<ReviewFactor[]> {
   if (error) throw error;
   return data;
 }
-export async function readOwnReview(placeId: string, userId: string, signal?: AbortSignal) {
-  if (!userId) return null;
-  let query = requireBackend()
-    .from("avaliacoes")
-    .select("sentimento,comentario,avaliacao_fatores(fator_id)")
-    .eq("lugar_id", placeId)
-    .eq("usuario_id", userId);
-  if (signal) query = query.abortSignal(signal);
-  const { data, error } = await query.maybeSingle();
-  if (error) throw error;
-  return data;
-}
-export async function saveReview(
-  placeId: string,
-  mood: string,
-  comment: string,
-  factors: string[],
-) {
-  const { error } = await requireBackend().rpc("salvar_avaliacao", {
+export async function createReview({
+  placeId,
+  mood,
+  comment,
+  factors,
+}: {
+  placeId: string;
+  mood: string;
+  comment: string;
+  factors: string[];
+}, submissionId: string) {
+  const { error } = await requireBackend().rpc("criar_avaliacao", {
+    p_chave: submissionId,
     p_lugar: placeId,
     p_sentimento: mood,
     p_comentario: comment.trim(),
@@ -39,7 +33,7 @@ export async function saveReview(
 }
 type OwnReviewRow = Pick<
   Database["public"]["Tables"]["avaliacoes"]["Row"],
-  "id" | "lugar_id" | "sentimento" | "comentario" | "atualizado_em" | "status"
+  "id" | "sentimento" | "comentario" | "atualizado_em" | "status"
 > & { lugares: { nome: string } | null };
 export async function listOwnReviews(userId: string, cursor: Cursor | null) {
   if (!userId) return emptyPage<OwnReviewRow>();

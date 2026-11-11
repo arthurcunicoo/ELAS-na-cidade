@@ -1,0 +1,746 @@
+{
+  "environment": "Chromium; all Supabase interactions and map tiles simulated; no live writes",
+  "performance": {
+    "before-dev": [
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "throttle": 4,
+        "idleFilter": "blur(0px)",
+        "layers": {
+          "backdrops": 0,
+          "totalArea": 0,
+          "nodes": 181
+        },
+        "mapCount": 28,
+        "observed": {
+          "reduced": false,
+          "filterSupported": true,
+          "devicePixelRatio": 1
+        },
+        "run": [
+          {
+            "label": "mapa-eventos",
+            "elapsed": 2065,
+            "frames": 57,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 116.7,
+            "maxFrameMs": 400,
+            "framesOver40ms": 8,
+            "longTasks": 6,
+            "scriptMs": 1485,
+            "styleMs": 112,
+            "layoutMs": 10
+          },
+          {
+            "label": "eventos-mapa",
+            "elapsed": 3014,
+            "frames": 99,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 150,
+            "maxFrameMs": 183.3,
+            "framesOver40ms": 13,
+            "longTasks": 11,
+            "scriptMs": 1821,
+            "styleMs": 144,
+            "layoutMs": 12
+          },
+          {
+            "label": "mapa-eventos",
+            "elapsed": 1097,
+            "frames": 37,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 50.1,
+            "maxFrameMs": 266.7,
+            "framesOver40ms": 4,
+            "longTasks": 3,
+            "scriptMs": 721,
+            "styleMs": 128,
+            "layoutMs": 4
+          },
+          {
+            "label": "eventos-mapa",
+            "elapsed": 3375,
+            "frames": 96,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 183.3,
+            "maxFrameMs": 300,
+            "framesOver40ms": 15,
+            "longTasks": 11,
+            "scriptMs": 2309,
+            "styleMs": 151,
+            "layoutMs": 17
+          },
+          {
+            "label": "mapa-eventos",
+            "elapsed": 1076,
+            "frames": 40,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 50,
+            "maxFrameMs": 283.3,
+            "framesOver40ms": 4,
+            "longTasks": 3,
+            "scriptMs": 589,
+            "styleMs": 81,
+            "layoutMs": 6
+          },
+          {
+            "label": "eventos-mapa",
+            "elapsed": 2490,
+            "frames": 79,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 133.3,
+            "maxFrameMs": 233.2,
+            "framesOver40ms": 12,
+            "longTasks": 9,
+            "scriptMs": 1483,
+            "styleMs": 101,
+            "layoutMs": 8
+          },
+          {
+            "label": "arrastar mapa",
+            "elapsed": 1147,
+            "frames": 50,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 100,
+            "maxFrameMs": 116.7,
+            "framesOver40ms": 3,
+            "longTasks": 4,
+            "scriptMs": 741,
+            "styleMs": 43,
+            "layoutMs": 3
+          }
+        ],
+        "motion": [
+          {
+            "source": "/mapa",
+            "target": "/alertas",
+            "maxBlur": 14,
+            "sourceBlurFrames": 15,
+            "targetBlurFrames": 14
+          },
+          {
+            "source": "/alertas",
+            "target": "/mapa",
+            "maxBlur": 14,
+            "sourceBlurFrames": 16,
+            "targetBlurFrames": 11
+          }
+        ],
+        "reducedFilter": "blur(0px)",
+        "errors": [],
+        "unknown": [],
+        "profileTop": [
+          [
+            "(program)",
+            2925
+          ],
+          [
+            "exports.createElement",
+            1698
+          ],
+          [
+            "run",
+            1536
+          ],
+          [
+            "exports.jsx",
+            1067
+          ],
+          [
+            "(anonymous)",
+            633
+          ],
+          [
+            "ReactElement",
+            410
+          ],
+          [
+            "exports.jsxs",
+            287
+          ],
+          [
+            "measure",
+            287
+          ],
+          [
+            "prepareFreshStack",
+            223
+          ],
+          [
+            "logComponentRender",
+            221
+          ],
+          [
+            "addObjectDiffToProperties",
+            214
+          ],
+          [
+            "commitLayoutEffectOnFiber",
+            208
+          ],
+          [
+            "recursivelyTraverseMutationEffects",
+            203
+          ],
+          [
+            "runWithFiberInDEV",
+            202
+          ],
+          [
+            "commitMutationEffectsOnFiber",
+            190
+          ],
+          [
+            "(garbage collector)",
+            185
+          ],
+          [
+            "now",
+            168
+          ],
+          [
+            "react_stack_bottom_frame",
+            164
+          ],
+          [
+            "getRect",
+            135
+          ],
+          [
+            "createElement",
+            129
+          ]
+        ]
+      }
+    ],
+    "before-prod": [
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "throttle": 4,
+        "idleFilter": "blur(0px)",
+        "layers": {
+          "backdrops": 0,
+          "totalArea": 0,
+          "nodes": 181
+        },
+        "mapCount": 28,
+        "observed": {
+          "reduced": false,
+          "filterSupported": true,
+          "devicePixelRatio": 1
+        },
+        "run": [
+          {
+            "label": "mapa-eventos",
+            "elapsed": 1324,
+            "frames": 57,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 50,
+            "maxFrameMs": 149.9,
+            "framesOver40ms": 5,
+            "longTasks": 2,
+            "scriptMs": 591,
+            "styleMs": 137,
+            "layoutMs": 12
+          },
+          {
+            "label": "eventos-mapa",
+            "elapsed": 1804,
+            "frames": 87,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 50,
+            "maxFrameMs": 116.6,
+            "framesOver40ms": 7,
+            "longTasks": 1,
+            "scriptMs": 588,
+            "styleMs": 156,
+            "layoutMs": 17
+          },
+          {
+            "label": "mapa-eventos",
+            "elapsed": 842,
+            "frames": 45,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 33.4,
+            "maxFrameMs": 66.7,
+            "framesOver40ms": 1,
+            "longTasks": 1,
+            "scriptMs": 229,
+            "styleMs": 132,
+            "layoutMs": 2
+          },
+          {
+            "label": "eventos-mapa",
+            "elapsed": 1843,
+            "frames": 87,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 50,
+            "maxFrameMs": 83.3,
+            "framesOver40ms": 9,
+            "longTasks": 2,
+            "scriptMs": 561,
+            "styleMs": 136,
+            "layoutMs": 11
+          },
+          {
+            "label": "mapa-eventos",
+            "elapsed": 875,
+            "frames": 44,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 33.4,
+            "maxFrameMs": 100,
+            "framesOver40ms": 2,
+            "longTasks": 1,
+            "scriptMs": 326,
+            "styleMs": 130,
+            "layoutMs": 4
+          },
+          {
+            "label": "eventos-mapa",
+            "elapsed": 1774,
+            "frames": 85,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 50,
+            "maxFrameMs": 83.3,
+            "framesOver40ms": 8,
+            "longTasks": 1,
+            "scriptMs": 536,
+            "styleMs": 174,
+            "layoutMs": 12
+          },
+          {
+            "label": "arrastar mapa",
+            "elapsed": 748,
+            "frames": 44,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 16.8,
+            "maxFrameMs": 33.3,
+            "framesOver40ms": 0,
+            "longTasks": 0,
+            "scriptMs": 265,
+            "styleMs": 60,
+            "layoutMs": 4
+          }
+        ],
+        "motion": [
+          {
+            "source": "/mapa",
+            "target": "/alertas",
+            "maxBlur": 14,
+            "sourceBlurFrames": 16,
+            "targetBlurFrames": 16
+          },
+          {
+            "source": "/alertas",
+            "target": "/mapa",
+            "maxBlur": 14,
+            "sourceBlurFrames": 14,
+            "targetBlurFrames": 7
+          }
+        ],
+        "reducedFilter": "blur(0px)",
+        "errors": [],
+        "unknown": [],
+        "profileTop": [
+          [
+            "(program)",
+            3257
+          ],
+          [
+            "(anonymous)",
+            692
+          ],
+          [
+            "s",
+            275
+          ],
+          [
+            "o",
+            211
+          ],
+          [
+            "yc",
+            200
+          ],
+          [
+            "kc",
+            178
+          ],
+          [
+            "ac",
+            119
+          ],
+          [
+            "u",
+            117
+          ],
+          [
+            "f",
+            110
+          ],
+          [
+            "n",
+            101
+          ],
+          [
+            "Cc",
+            101
+          ],
+          [
+            "Bo",
+            93
+          ],
+          [
+            "get",
+            91
+          ],
+          [
+            "(garbage collector)",
+            90
+          ],
+          [
+            "Jn",
+            86
+          ],
+          [
+            "e.createElement",
+            80
+          ],
+          [
+            "Ko",
+            67
+          ],
+          [
+            "e",
+            66
+          ],
+          [
+            "sa",
+            65
+          ],
+          [
+            "y",
+            58
+          ]
+        ]
+      }
+    ],
+    "after-prod": [
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "throttle": 4,
+        "idleFilter": "none",
+        "layers": {
+          "backdrops": 0,
+          "totalArea": 0,
+          "nodes": 181
+        },
+        "mapCount": 28,
+        "observed": {
+          "reduced": false,
+          "filterSupported": true,
+          "devicePixelRatio": 1
+        },
+        "run": [
+          {
+            "label": "mapa-eventos",
+            "elapsed": 641,
+            "frames": 30,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 50.1,
+            "maxFrameMs": 133.3,
+            "framesOver40ms": 2,
+            "longTasks": 1,
+            "scriptMs": 329,
+            "styleMs": 58,
+            "layoutMs": 9
+          },
+          {
+            "label": "eventos-mapa",
+            "elapsed": 1658,
+            "frames": 79,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 50,
+            "maxFrameMs": 100.1,
+            "framesOver40ms": 7,
+            "longTasks": 1,
+            "scriptMs": 552,
+            "styleMs": 139,
+            "layoutMs": 15
+          },
+          {
+            "label": "mapa-eventos",
+            "elapsed": 581,
+            "frames": 30,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 33.4,
+            "maxFrameMs": 66.8,
+            "framesOver40ms": 1,
+            "longTasks": 1,
+            "scriptMs": 208,
+            "styleMs": 60,
+            "layoutMs": 5
+          },
+          {
+            "label": "eventos-mapa",
+            "elapsed": 1725,
+            "frames": 80,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 66.7,
+            "maxFrameMs": 116.6,
+            "framesOver40ms": 6,
+            "longTasks": 1,
+            "scriptMs": 616,
+            "styleMs": 104,
+            "layoutMs": 11
+          },
+          {
+            "label": "mapa-eventos",
+            "elapsed": 619,
+            "frames": 29,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 33.4,
+            "maxFrameMs": 116.6,
+            "framesOver40ms": 1,
+            "longTasks": 1,
+            "scriptMs": 246,
+            "styleMs": 55,
+            "layoutMs": 6
+          },
+          {
+            "label": "eventos-mapa",
+            "elapsed": 1752,
+            "frames": 76,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 66.7,
+            "maxFrameMs": 100,
+            "framesOver40ms": 8,
+            "longTasks": 3,
+            "scriptMs": 643,
+            "styleMs": 122,
+            "layoutMs": 13
+          },
+          {
+            "label": "arrastar mapa",
+            "elapsed": 706,
+            "frames": 42,
+            "medianFrameMs": 16.7,
+            "p95FrameMs": 16.8,
+            "maxFrameMs": 33.3,
+            "framesOver40ms": 0,
+            "longTasks": 0,
+            "scriptMs": 243,
+            "styleMs": 50,
+            "layoutMs": 3
+          }
+        ],
+        "motion": [
+          {
+            "source": "/mapa",
+            "target": "/alertas",
+            "maxBlur": 6,
+            "sourceBlurFrames": 9,
+            "targetBlurFrames": 5
+          },
+          {
+            "source": "/alertas",
+            "target": "/mapa",
+            "maxBlur": 6,
+            "sourceBlurFrames": 18,
+            "targetBlurFrames": 12
+          }
+        ],
+        "reducedFilter": "none",
+        "errors": [],
+        "unknown": [],
+        "profileTop": [
+          [
+            "(program)",
+            2313
+          ],
+          [
+            "(anonymous)",
+            570
+          ],
+          [
+            "s",
+            227
+          ],
+          [
+            "Cc",
+            196
+          ],
+          [
+            "o",
+            171
+          ],
+          [
+            "kc",
+            160
+          ],
+          [
+            "u",
+            107
+          ],
+          [
+            "sa",
+            101
+          ],
+          [
+            "f",
+            101
+          ],
+          [
+            "e.createElement",
+            89
+          ],
+          [
+            "n",
+            83
+          ],
+          [
+            "Bo",
+            82
+          ],
+          [
+            "(garbage collector)",
+            76
+          ],
+          [
+            "get",
+            75
+          ],
+          [
+            "E",
+            67
+          ],
+          [
+            "e",
+            67
+          ],
+          [
+            "Ko",
+            58
+          ],
+          [
+            "Jn",
+            56
+          ],
+          [
+            "es",
+            48
+          ],
+          [
+            "ep",
+            48
+          ]
+        ]
+      }
+    ]
+  },
+  "desktopFlows": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "blur": true,
+      "stableNavigation": true,
+      "rapidTabs": true,
+      "reducedMotion": true,
+      "profileOptions": [
+        "informacoes-pessoais",
+        "configuracoes",
+        "minhas-avaliacoes",
+        "favoritos",
+        "meus-relatos",
+        "minhas-solicitacoes",
+        "notificacoes",
+        "conquistas",
+        "foto-perfil"
+      ],
+      "requestedTransition": {
+        "from": "/alertas",
+        "to": "/mapa",
+        "maxBlur": 6
+      },
+      "sharedReportButtons": true,
+      "reviewSubmission": true,
+      "classifications": [
+        "Seguro",
+        "Moderado",
+        "Cuidado"
+      ],
+      "examplePlaces": [],
+      "realRatingsTakePriority": true,
+      "logoutToWelcome": true,
+      "runtimeErrors": 0
+    },
+    {
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "blur": true,
+      "stableNavigation": true,
+      "rapidTabs": true,
+      "reducedMotion": true,
+      "profileOptions": [
+        "informacoes-pessoais",
+        "configuracoes",
+        "minhas-avaliacoes",
+        "favoritos",
+        "meus-relatos",
+        "minhas-solicitacoes",
+        "notificacoes",
+        "conquistas",
+        "foto-perfil"
+      ],
+      "requestedTransition": {
+        "from": "/alertas",
+        "to": "/mapa",
+        "maxBlur": 6
+      },
+      "sharedReportButtons": true,
+      "reviewSubmission": true,
+      "classifications": [
+        "Seguro",
+        "Moderado",
+        "Cuidado"
+      ],
+      "examplePlaces": [],
+      "realRatingsTakePriority": true,
+      "logoutToWelcome": true,
+      "runtimeErrors": 0
+    }
+  ],
+  "nativeCompatibility": {
+    "expoVersion": "58.0.23",
+    "results": [
+      {
+        "platform": "android",
+        "sdkVersion": "58.0.0",
+        "runtimeVersion": "exposdk:58.0.0",
+        "launchBundle": true,
+        "bundleBytes": 14170170
+      },
+      {
+        "platform": "ios",
+        "sdkVersion": "58.0.0",
+        "runtimeVersion": "exposdk:58.0.0",
+        "launchBundle": true,
+        "bundleBytes": 14178320
+      }
+    ],
+    "physicalDeviceTested": false
+  }
+}

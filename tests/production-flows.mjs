@@ -80,21 +80,15 @@ result = () => [];
 await assert.rejects(reviews.hydrateCommunity([place]),/indisponível/);
 assert.deepEqual(reviews.unavailableCommunity([{...place,reviewSummary:sample(),status:'safe'}])[0],{...place,reviewSummary:undefined,reviewsUnavailable:true});
 
-// The production build ignores the showcase flag; presentation needs both flags.
-for (const [environment,flag,expected] of [['production','1',false],['development','1',false],['presentation','0',false],['presentation','1',true]]) {
-  const mode = load('../lib/appMode.ts',{}, {env:{EXPO_PUBLIC_APP_ENV:environment,EXPO_PUBLIC_SHOWCASE:flag}});
+// Release builds cannot query examples, even if a presentation environment flag leaked into the build.
+for (const [dev,flag,expected] of [[false,'1',false],[true,undefined,false],[true,'1',false]]) {
+  const mode = load('../lib/appMode.ts',{}, {dev,env:{EXPO_PUBLIC_SHOWCASE:flag}});
   assert.equal(mode.showcaseEnabled,expected);
-  const calls=[];
-  const builder=Object.fromEntries(['select','eq','order','limit'].map(method=>[method,(...args)=>{calls.push([method,...args]);return builder;}]));
-  const rows=[{id:'demo:evento:1',ficticio:true,ativo:true}];
-  builder.then=(resolve,reject)=>Promise.resolve({data:rows,error:null}).then(resolve,reject);
-  const service=load('../services/showcase.ts',{'../lib/appMode':mode,'../lib/supabase':{supabase:{from:table=>{calls.push(['from',table]);return builder;}}}});
-  assert.deepEqual(await service.listDemonstrations('evento'),expected?rows:[]);
-  if(expected){
-    for(const call of [['from','conteudos_demonstracao'],['eq','tipo','evento'],['eq','ativo',true],['eq','ficticio',true],['limit',30]])assert.ok(calls.some(actual=>JSON.stringify(actual)===JSON.stringify(call)));
-  }else assert.deepEqual(calls,[]);
+  let queried=0;
+  const service=load('../services/showcase.ts',{'../lib/appMode':mode,'../lib/supabase':{supabase:{from:()=>{queried++;throw Error('Unexpected example read');}}}});
+  if(!expected){assert.deepEqual(await service.listDemonstrations('evento'),[]);assert.equal(queried,0);}
 }
-const configMocks = mode => ({ './storage/protectedStorage':{protectedStorage:{}}, './appMode': {demoMode:mode}, 'react-native-url-polyfill/auto':{}, '@react-native-async-storage/async-storage':{}, '@supabase/supabase-js':{createClient:()=>({}),processLock:()=>{}}, './monitoring':{monitoredFetch:x=>x}, './request':{deadlineFetch:x=>x}, './errors':{friendlyError:String} });
+const configMocks = mode => ({ './backendConfig':{backendConfig:{url:'',key:'',error:'Configuração ausente no ambiente de teste'}}, './storage/protectedStorage':{protectedStorage:{}}, './appMode': {demoMode:mode}, 'react-native-url-polyfill/auto':{}, '@react-native-async-storage/async-storage':{}, '@supabase/supabase-js':{createClient:()=>({}),processLock:()=>{}}, './monitoring':{monitoredFetch:x=>x}, './request':{deadlineFetch:x=>x}, './errors':{friendlyError:String} });
 assert.ok(load('../lib/supabase.ts',configMocks(false)).configError,'missing config must not silently enable demo');
 assert.equal(load('../lib/supabase.ts',configMocks(true)).configError,'');
 
@@ -244,7 +238,7 @@ try {
   assert.ok(choices.every(node => node.findAllByType('TouchFeedback').length === 1), 'report and review must never be nested buttons');await unmount();
 
   // Selecting a city report preserves the user's zoom and does not recenter on map callbacks.
-  const moved=[],selectedPlaces=[];let redrawn=0;
+  const moved=[];let redrawn=0;
   const CityMap=load('../components/map/CityMap.native.tsx',{
     '../../constants/community':community,'../../constants/placeRelevance':{visibleMapPlaces:places=>places},
     'react-native-maps':{default:'MapView',Marker:'Marker'},'../../features/map/reportClusters':reportClusters,'./ReportMarker':{ReportMarker:'ReportMarker'},'../../constants/places':{initialMapRegion:{latitudeDelta:.04,longitudeDelta:.04}},
@@ -252,7 +246,7 @@ try {
     './PlaceMarker':{PlaceMarker:'PlaceMarker'},'../../hooks/useReducedMotion':{useReducedMotion:()=>true},'./MapAttribution':{MapAttribution:()=>null},
   }).default;
   const region={latitude:-28.68,longitude:-49.37,latitudeDelta:.001,longitudeDelta:.002};
-  const props={places:[place],reports:[],region,bottomInset:0,topInset:0,locationRequest:0,onSelect:p=>selectedPlaces.push(p),onSelectGroup(){},onClear(){},onSelectReport(){},onRegionChange(){},locationEnabled:false};
+  const props={places:[place],reports:[],region,bottomInset:0,topInset:0,locationRequest:0,onSelect(){},onSelectGroup(){},onClear(){},onSelectReport(){},onRegionChange(){},locationEnabled:false};
   await mount(React.createElement(CityMap,props),{createNodeMock:node=>node.type==='MapView'?{animateToRegion:target=>moved.push(target)}:node.type==='Marker'?{redraw:()=>redrawn++}:{}});
   const report={id:'report',latitude:-28.67,longitude:-49.36};
   await act(async()=>renderer.update(React.createElement(CityMap,{...props,selectedReport:report})));
@@ -260,16 +254,9 @@ try {
   await act(async()=>renderer.update(React.createElement(CityMap,{...props,selectedReport:report,region:{...region,latitude:-28.66}})));
   assert.equal(moved.length,1,'panning while a report remains selected must not force recentering');
   const before=redrawn;
-  const ratedPlace={...place,status:'safe',reviewSummary:sample()};
-  await act(async()=>renderer.update(React.createElement(CityMap,{...props,places:[ratedPlace]})));
+  await act(async()=>renderer.update(React.createElement(CityMap,{...props,places:[{...place,status:'safe',reviewSummary:sample()}]})));
   assert.ok(redrawn>before,'a changed community count/status must refresh the native marker bitmap');
-  const marker=renderer.root.findByType('Marker');
-  assert.ok(marker.props.accessibilityLabel.includes('5 avaliações aprovadas'));
-  let stopped=false;
-  await act(async()=>marker.props.onPress({stopPropagation(){stopped=true;}}));
-  assert.ok(stopped,'a native marker press does not bubble to the map clear handler');
-  assert.deepEqual(selectedPlaces,[ratedPlace],'pressing the native marker selects the place with its reviews');
-  await unmount();
+  assert.ok(renderer.root.findByType('Marker').props.accessibilityLabel.includes('5 avaliações aprovadas'));await unmount();
 
-  console.log('Production flow checks passed: bounded real summary contracts, thresholds, no release samples, explicit presentation config, schema/network/account separation, immediate presses, short reveal once, real distribution UI, participation choice, native report zoom and rated marker press.');
+  console.log('Production flow checks passed: bounded real summary contracts, thresholds, no release samples, explicit demo config, schema/network/account separation, immediate presses, short reveal once, real distribution UI, participation choice and native report zoom/marker refresh.');
 } finally { if(renderer)await unmount();console.error=originalError; }

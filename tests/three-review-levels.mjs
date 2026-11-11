@@ -16,7 +16,7 @@ try {
   create table storage.objects(id uuid default gen_random_uuid() primary key,bucket_id text,name text);create function storage.foldername(name text) returns text[] language sql immutable as $$select string_to_array(name,'/')$$;
   alter table storage.objects enable row level security;grant usage on schema storage to authenticated;grant select,insert,update,delete on storage.objects to authenticated;`);
  for(const id of [A,B,C])await db.query('insert into auth.users values($1)',[id]);
- for(const f of readdirSync('supabase/migrations').filter(f=>f.endsWith('.sql')&&f!==migration).sort())await db.exec(readFileSync('supabase/migrations/'+f,'utf8'));
+ for(const f of readdirSync('supabase/migrations').filter(f=>f.endsWith('.sql')&&f<migration).sort())await db.exec(readFileSync('supabase/migrations/'+f,'utf8'));
  await db.exec(readFileSync('supabase/seed.sql','utf8'));
  await db.exec("insert into public.lugares(id,nome,endereco,latitude,longitude) values('nacoes','Parque de teste','Centro',-28.68,-49.37)");
  await db.query("insert into public.avaliacoes(usuario_id,lugar_id,sentimento,status,comentario) values($1,'nereu','Atenção','aprovada','privado'),($2,'congresso','Atenção','pendente','privado')",[A,B]);

@@ -8,14 +8,17 @@ do $$
 declare review_id uuid; repeat_id uuid; author uuid:=auth.uid(); visible integer; blocked boolean;
 begin
  if author is null or nullif(current_setting('elas.test_b'),'') is null then raise exception 'Two existing users are required';end if;
- select public.salvar_avaliacao('nereu','Segura','Fixture transitória',array['iluminacao']) into review_id;
- select public.salvar_avaliacao('nereu','Moderada','Fixture revisada',array['movimento']) into repeat_id;
- if review_id<>repeat_id then raise exception 'Review id changed';end if;
+ select public.criar_avaliacao('nereu','Segura','Fixture transitória',array['iluminacao'],gen_random_uuid()) into review_id;
+ select public.criar_avaliacao('nereu','Moderada','Segunda fixture',array['movimento'],gen_random_uuid()) into repeat_id;
+ if review_id=repeat_id then raise exception 'Second submission overwrote the original';end if;
+ blocked:=false;
+ begin
+  update public.avaliacoes set comentario='Alteração proibida' where id=review_id;
+ exception when insufficient_privilege then blocked:=true;end;
+ if not blocked then raise exception 'Author can update a submitted review';end if;
  perform set_config('request.jwt.claim.sub',current_setting('elas.test_b'),true);
  select count(*) into visible from public.avaliacoes where id=review_id;
  if visible<>0 then raise exception 'Cross-account read exposed';end if;
- update public.avaliacoes set comentario='Alteração proibida' where id=review_id;
- if found then raise exception 'Cross-account update exposed';end if;
  blocked:=false;
  begin perform public.admin_resumo();exception when insufficient_privilege then blocked:=true;end;
  if not blocked then raise exception 'Ordinary account accessed admin';end if;
@@ -26,8 +29,10 @@ begin
  begin perform 1 from private.papeis;exception when insufficient_privilege then blocked:=true;end;
  if not blocked then raise exception 'Roles exposed';end if;
  perform set_config('request.jwt.claim.sub',author::text,true);
- select count(*) into visible from public.avaliacoes where id=review_id and comentario='Fixture revisada';
- if visible<>1 then raise exception 'Original review modified by another user';end if;
+ select count(*) into visible from public.avaliacoes
+ where (id=review_id and comentario='Fixture transitória' and sentimento='Segura')
+    or (id=repeat_id and comentario='Segunda fixture' and sentimento='Moderada');
+ if visible<>2 then raise exception 'Both independent reviews should be intact';end if;
 end $$;
 reset role;
 rollback;

@@ -32,10 +32,10 @@ function load(relative){if(relative==='lib/supabase.ts')return {requireBackend:(
  const source=ts.transpileModule(fs.readFileSync(filename,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
  new Function('require','module','exports',source)(name=>{assert.ok(name.startsWith('.'),name);const base=path.resolve(path.dirname(filename),name),candidate=[base,base+'.ts'].find(f=>fs.existsSync(f)&&fs.statSync(f).isFile());return load(path.relative(root,candidate));},module,module.exports);return module.exports;
 }
-const places=load('services/places.ts'),reports=load('services/reports.ts'),community=load('services/communityReviews.ts'),pages=load('services/pagination.ts'),reviews=load('services/reviews.ts');
+const places=load('services/places.ts'),reports=load('services/reports.ts'),community=load('services/communityReviews.ts'),pages=load('services/pagination.ts');
 const region={latitude:-28.68,longitude:-49.37,latitudeDelta:.02,longitudeDelta:.02};
 const settle=async()=>{for(let i=0;i<20;i++)await Promise.resolve();};
-for(const operation of [signal=>places.nearbyPlaces(region,'all',signal),signal=>places.searchImportedPlaces('praça','all',null,signal),signal=>places.resolvePlace('fixture',signal),signal=>reports.mapReports(region,15,signal),signal=>reports.findReport('fixture',signal),signal=>community.hydrateCommunity([{id:'fixture'}],signal),signal=>pages.cursorPage('eventos',null,{},signal),signal=>reviews.readOwnReview('fixture','fixture-owner',signal)]) {
+for(const operation of [signal=>places.nearbyPlaces(region,'all',signal),signal=>places.searchImportedPlaces('praça','all',null,signal),signal=>places.resolvePlace('fixture',signal),signal=>reports.mapReports(region,15,signal),signal=>reports.findReport('fixture',signal),signal=>community.hydrateCommunity([{id:'fixture'}],signal),signal=>pages.cursorPage('eventos',null,{},signal)]) {
  const controller=new AbortController(),before=requests.length;
  const pending=operation(controller.signal);const rejection=assert.rejects(pending,error=>String(error.message).includes('abort'));
  await settle();assert.equal(requests.length,before+1,'the real SDK must start one read');assert.equal(requests.at(-1).signal.aborted,false);

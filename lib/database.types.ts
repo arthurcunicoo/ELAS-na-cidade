@@ -1010,6 +1010,16 @@ export type Database = {
       resumos_avaliacoes:
         | { Args: { p_lugares: string[] }; Returns: Json }
         | { Args: { p_compacto: boolean; p_lugares: string[] }; Returns: Json }
+      criar_avaliacao: {
+        Args: {
+          p_chave: string
+          p_comentario: string
+          p_fatores: string[]
+          p_lugar: string
+          p_sentimento: string
+        }
+        Returns: string
+      }
       salvar_avaliacao: {
         Args: {
           p_comentario: string

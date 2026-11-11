@@ -1,5 +1,3 @@
-import type { ViewStyle } from "react-native";
-
 // Product palette: use semantic roles in screens. Artwork and map geometry have explicit exceptions.
 export const palette = {
   brand: "#BD1C51",
@@ -114,43 +112,20 @@ export const typography = {
   caption: 12,
   navigation: 12,
 };
-type SurfaceShadow = {
-  shadowColor: string;
-  shadowOpacity: number;
-  shadowRadius: number;
-  shadowOffset: { width: number; height: number };
-  elevation: number;
-};
-
-export function surfaceShadow(style: SurfaceShadow): Pick<ViewStyle, keyof SurfaceShadow | "boxShadow"> {
-  if (process.env.EXPO_OS !== "android") return style;
-  // Android elevation can show through a translucent card. An outset shadow
-  // is clipped to its exterior. Android below API 28 ignores boxShadow.
-  const alpha = Math.round(style.shadowOpacity * 255).toString(16).padStart(2, "0");
-  return {
-    boxShadow: [{
-      offsetX: style.shadowOffset.width,
-      offsetY: style.shadowOffset.height,
-      blurRadius: style.shadowRadius,
-      color: `${style.shadowColor}${alpha}`,
-    }],
-  };
-}
-
-export const cardShadow = surfaceShadow({
+export const cardShadow = {
   shadowColor: palette.text,
   shadowOpacity: 0.08,
   shadowRadius: 16,
   shadowOffset: { width: 0, height: 6 },
   elevation: 3,
-});
-export const glassShadow = surfaceShadow({
+};
+export const glassShadow = {
   shadowColor: palette.wine,
   shadowOpacity: 0.14,
   shadowRadius: 22,
   shadowOffset: { width: 0, height: 8 },
   elevation: 5,
-});
+};
 export const cardSurface = {
   backgroundColor: glass.surfaceStrong,
   borderRadius: radius.large,

@@ -1,0 +1,53 @@
+{
+  "dateLocal": "2026-11-10",
+  "presentationDateLocal": "2026-11-12",
+  "projectRef": "pxcbzjxgxdmdayqwpqcj",
+  "expo": "58.0.23",
+  "backendVersion": 11,
+  "npmCi": "passed",
+  "verifyBefore": "passed",
+  "verifyAfter": "passed",
+  "liveDatabaseTest": "passed; simulated authenticated claims; fixtures rolled back",
+  "actualPasswordLoginTested": false,
+  "actualEmailDeliveryTested": false,
+  "physicalDeviceTested": false,
+  "counts": {
+    "eventsPublishedFuture": 6,
+    "pollsOpen": 3,
+    "reviewsTotal": 11,
+    "reviewsApproved": 4,
+    "reportsTotal": 5,
+    "reportsVerified": 1,
+    "reportsLast24h": 0,
+    "improvements": 0,
+    "places": 1535
+  },
+  "adminAccountExists": true,
+  "onlyAdminAccount": "teste.elas@example.com",
+  "authSettings": {
+    "emailEnabled": true,
+    "signupsEnabled": true,
+    "autoConfirmed": true
+  },
+  "publicRatings": {
+    "Praça do Congresso": "Seguro",
+    "Shopping dos Camelôs": "Moderado",
+    "Praça Nereu Ramos": "Cuidado",
+    "Parque das Nações": "Sem avaliações suficientes"
+  },
+  "pendingDeployments": [
+    "account-erasure",
+    "catalog-job-jitter",
+    "atomic-catalog-ingestion",
+    "backend-capabilities",
+    "admin-roles-audit"
+  ],
+  "pushEnabled": false,
+  "catalogTiles": 81,
+  "tilesWithReceivedData": 0,
+  "fixes": [
+    "Remove Corrigir meu registro with exclusive form/edit state",
+    "Presentation launcher defaults review examples to off"
+  ],
+  "note": "Does not certify app-store production readiness or validate the professor's machine."
+}

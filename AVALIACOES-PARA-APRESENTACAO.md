@@ -14,7 +14,7 @@ Há **20 avaliações ilustrativas** gravadas no Supabase, quatro em cada um dos
 
 1. Encerre o Expo da versão anterior e abra **Apresentar-ELAS.cmd**, ou execute `npm run apresentacao`.
 2. Entre em uma conta, vá ao Mapa e busque um dos lugares da tabela.
-3. Toque no marcador do ELAS para abrir o cartão e ver a classificação. Expanda os detalhes para ver **Avaliações recentes**, com nome, sentimento e comentário.
+3. Toque no lugar e expanda os detalhes para ver **Avaliações recentes**, com nome, sentimento e comentário.
 4. Role o conteúdo do cartão para ver as quatro contribuições ilustrativas.
 
 O selo e os cartões identificam os exemplos como apresentação. Quando o lugar tem percepção pública real ou uma avaliação da própria conta, essa informação tem prioridade no cabeçalho; os exemplos continuam em uma seção separada. Para mostrar os três selos ilustrativos, use uma conta que ainda não tenha avaliado esses lugares.
@@ -25,13 +25,12 @@ O atalho prepara automaticamente as dependências e limpa o cache. O `npm ci` fo
 
 As amostras estão na tabela já existente `conteudos_demonstracao`, com `ficticio=true` e IDs exclusivos iniciados em `demo:apresentacao-avaliacao:`. Não foram criadas pessoas no Auth, avaliações aprovadas em nome de terceiros, nem votos, relatos ou métricas reais. A tabela `avaliacoes` foi conferida antes e depois da inserção e permaneceu intacta.
 
-O carregamento é restrito ao modo `presentation` com `EXPO_PUBLIC_REVIEW_EXAMPLES=1`, ativo no atalho e no `npm start` deste pacote. Os modos normal e de produção mantêm esse recurso desligado. Os clientes apenas leem os registros permitidos pelas regras existentes do Supabase; não podem escrever nessa tabela. Os nomes e comentários reais das pessoas continuam privados.
+O carregamento é restrito ao modo `presentation` com `EXPO_PUBLIC_REVIEW_EXAMPLES=1`, ativado pelo atalho. Os modos normal e de produção mantêm esse recurso desligado. Os clientes apenas leem os registros permitidos pelas regras existentes do Supabase; não podem escrever nessa tabela. Os nomes e comentários reais das pessoas continuam privados.
 
-Para abrir sem conteúdo de apresentação no PowerShell:
+Para abrir o atalho sem exemplos no PowerShell:
 
 ```powershell
 $env:EXPO_PUBLIC_REVIEW_EXAMPLES="0"
-$env:EXPO_PUBLIC_SHOWCASE="0"
 npm run apresentacao
 ```
 

@@ -14,7 +14,8 @@ let options;const fetcher=async()=>new Response('fixture');
 const module={exports:{}};
 const source=ts.transpileModule(fs.readFileSync('lib/account.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 new Function('require','module','exports',source)(name=>{
- if(name==='@supabase/supabase-js')return {createClient:(_url,_key,value)=>{options=value;return {fixture:true};}};
+ if(name==='@supabase/supabase-js')return {createClient:(url,key,value)=>{assert.equal(url,'https://fixture.supabase.co');assert.equal(key,'sb_publishable_fixture');options=value;return {fixture:true};}};
+ if(name==='./backendConfig')return {backendConfig:{url:'https://fixture.supabase.co',key:'sb_publishable_fixture'}};
  if(name==='./supabase')return {backendConfigured:true,backendFetch:fetcher,requireBackend:()=>({})};
  throw Error('Unexpected dependency '+name);
 },module,module.exports);

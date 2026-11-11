@@ -4,11 +4,12 @@ import { Alert, Text, useWindowDimensions } from "react-native";
 import { FeaturePage } from "../components/shared/FeaturePage";
 import { Action } from "../components/shared/FormControls";
 import { monitoringEnabled } from "../lib/monitoring";
+import { backendConfig } from "../lib/backendConfig";
 // Deliberately unavailable in production; used only by a dedicated staging build.
 export default function Diagnostics() {
   const { fontScale, width, height } = useWindowDimensions();
   const backendHost = new URL(
-    process.env.EXPO_PUBLIC_SUPABASE_URL ?? "https://unconfigured.invalid",
+    backendConfig.url || "https://unconfigured.invalid",
   ).host;
   const enabled =
     process.env.EXPO_PUBLIC_APP_ENV === "staging" &&
