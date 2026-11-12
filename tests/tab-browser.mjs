@@ -51,6 +51,13 @@ try {
    if(name==='pagina_app')return reply({rows:args.p_lista==='avaliacoes'?[...savedReviews].reverse():[],nextCursor:null});
    if(name==='mapa_lugares')return reply({places:[place],warning:'',refreshing:false});
    if(name==='mapa_relatos')return reply({total:0,nodes:[]});
+   if(name==='relatos'){
+    assert.equal(request.method(),'GET');
+    assert.equal(url.searchParams.get('status'),'eq.verificado');
+    assert.equal(url.searchParams.get('order'),'criado_em.desc,id.desc');
+    assert.equal(url.searchParams.get('limit'),'3');
+    return reply([]);
+   }
    if(name==='resolver_lugar')return reply([fixturePlaces.get(args.p_id)??place]);
    if(name==='conteudos_demonstracao'){
     assert.equal(examplesEnabled,true,'normal builds must not request presentation reviews');

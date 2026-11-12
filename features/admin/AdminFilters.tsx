@@ -12,8 +12,9 @@ export const adminKinds: { id: AdminKind; label: string }[] = [
   { id: "lugar", label: "Lugares" },
   { id: "perfil", label: "Cadastros" },
 ];
+export const reportDecisionStatuses = ["verificado", "resolvido", "negado"] as const;
 export const adminStatuses: Partial<Record<AdminKind, string[]>> = {
-  relato: ["pendente", "verificado", "resolvido"],
+  relato: ["pendente", ...reportDecisionStatuses],
   melhoria: ["solicitada", "em_andamento", "concluida"],
   avaliacao: ["pendente", "aprovada", "rejeitada"],
 };

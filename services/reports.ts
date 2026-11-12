@@ -1,5 +1,5 @@
 import { cursorPage } from "./pagination";
-import { emptyPage, type Cursor } from "../lib/pagination";
+import { type Cursor } from "../lib/pagination";
 import { MapRegion } from "../constants/places";
 import { supabase } from "../lib/supabase";
 import { Database } from "../lib/database.types";
@@ -25,13 +25,20 @@ export const categories = [
   "Outro",
 ] as const;
 
-export const listReports = (cursor: Cursor | null, recent = false) =>
-  supabase
-    ? cursorPage<Report>("relatos", cursor, {
-        recentes: recent,
-        publicas: true,
-      })
-    : Promise.resolve(emptyPage<Report>());
+const reportColumns = "id,lugar_id,categoria,descricao,local_texto,latitude,longitude,status,criado_em";
+export const RECENT_REPORT_LIMIT = 3;
+export async function listRecentVerifiedReports(): Promise<Report[]> {
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from("relatos")
+    .select(reportColumns)
+    .eq("status", "verificado")
+    .order("criado_em", { ascending: false })
+    .order("id", { ascending: false })
+    .limit(RECENT_REPORT_LIMIT);
+  if (error) throw error;
+  return data;
+}
 export type ReportBounds = {
   south: number;
   west: number;
@@ -124,7 +131,7 @@ export async function findReport(id: string, signal?: AbortSignal) {
   if (!supabase) return null;
   const query = supabase
     .from("relatos")
-    .select("id,lugar_id,categoria,descricao,local_texto,latitude,longitude,status,criado_em")
+    .select(reportColumns)
     .eq("id", id);
   const { data, error } = await (signal ? query.abortSignal(signal) : query).maybeSingle();
   if (error) throw error;

@@ -26,6 +26,7 @@ export const statusLabels: Record<string, string> = {
   pendente: "Em análise",
   verificado: "Verificado",
   resolvido: "Resolvido",
+  negado: "Negado",
   solicitada: "Solicitada",
   em_andamento: "Em andamento",
   concluida: "Concluída",

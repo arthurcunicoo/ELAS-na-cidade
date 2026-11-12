@@ -29,9 +29,9 @@ const modules={
  'features/profile/usePagedList.ts':{usePagedList:()=>({rows,loading:false,error:'',refresh(){},more(){}})},
  'components/loading/LoadingState.tsx':{LoadingState:props=>React.createElement('LoadingState',props)},
  'components/loading/LoadingIndicator.tsx':{LoadingIndicator:props=>React.createElement('LoadingIndicator',props)},
- 'features/reports/HistoryList.tsx':{HistoryList:()=>null},
+ 'features/reports/HistoryList.tsx':{HistoryList:props=>React.createElement('HistoryList',props)},
  'services/improvements.ts':{emptyImpacts,listImprovements:()=>new Promise((resolve,reject)=>requests.push({user,resolve,reject}))},
- 'services/reports.ts':{listReports(){}},
+ 'services/reports.ts':{listRecentVerifiedReports(){},RECENT_REPORT_LIMIT:3},
  'lib/supabase.ts':{friendlyError:e=>e.message},
 };
 const external={'react':React,'react/jsx-runtime':require('react/jsx-runtime'),'react-native':native,'expo-status-bar':{StatusBar:()=>null},
@@ -67,8 +67,22 @@ try{
  assert.deepEqual(renderer.root.findAllByType('Stat').map(n=>n.props.total),[3,3,3]);
  assert.equal(presentation.minhas.counts.solicitada,0,'presentation never mutates real personal totals');
  await unmount();user=null;
- const Reports=load('app/alertas.tsx').default;await mount(Reports);assert.ok(text().includes('Relatos'));await press('Notificações');assert.equal(navigation.at(-1),'/notificacoes');await press('Meus relatos');assert.equal(navigation.at(-1),'/meus-relatos');await unmount();
+ rows = ['Relato um','Relato dois','Relato três'].map((name,index)=>({
+  id:String(index),local_texto:name,descricao:'Descrição',categoria:'Outro',status:'verificado',criado_em:'2026-10-20',
+ }));
+ const Reports=load('app/alertas.tsx').default;await mount(Reports);
+ assert.ok(text().includes('Relatos'));
+ assert.ok(text().indexOf('Relatar uma situação') < text().indexOf('Relato um'));
+ for(const row of rows) assert.ok(text().includes(row.local_texto));
+ await press('Relatar uma situação');assert.equal(navigation.at(-1),'/novo-relato');
+ await press('Notificações');assert.equal(navigation.at(-1),'/notificacoes');await press('Meus relatos');assert.equal(navigation.at(-1),'/meus-relatos');await unmount();
  const {OwnRecordsScreen}=load('features/reports/OwnRecordsScreen.tsx');rows=[{id:'own',local_texto:'Centro',descricao:'Descrição',status:'pendente',atualizado_em:'2026-10-20'}];
- await act(async()=>{renderer=TestRenderer.create(React.createElement(OwnRecordsScreen,{kind:'relato'}));});assert.ok(text().includes('Seu relato · aguardando verificação'));assert.ok(text().includes('Ainda não foi publicado para a cidade'));await unmount();
+ await act(async()=>{renderer=TestRenderer.create(React.createElement(OwnRecordsScreen,{kind:'relato'}));});
+ assert.ok(text().includes('Seu relato · aguardando verificação'));assert.ok(text().includes('Ainda não foi publicado para a cidade'));
+ assert.ok(!text().includes('Ver detalhes e gerenciar'));
+ await press('Acompanhar atualizações');assert.equal(renderer.root.findByType('HistoryList').props.id,'own');
+ rows = [{...rows[0],status:'negado'}];
+ await act(async()=>renderer.update(React.createElement(OwnRecordsScreen,{kind:'relato'})));
+ assert.ok(text().includes('Negado'));await unmount();
  console.log('Product UI checks passed: stale/account/sign-out isolation, personal/city counters and cards, separate history routes, canonical notification inbox and explicit pending-report privacy. Native layout is not simulated.');
 }finally{console.error=originalError;}

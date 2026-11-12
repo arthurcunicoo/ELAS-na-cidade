@@ -54,19 +54,21 @@ export function OwnRecordsScreen({ kind }: { kind: "relato" | "melhoria" }) {
               <Text style={shared.note}>{item.categoria}</Text>
             )}
             <Text style={shared.note}>{item.descricao}</Text>
-            <TouchFeedback
-              label="Abrir detalhes do registro"
-              onPress={() =>
-                router.push({
-                  pathname: "/registro",
-                  params: { kind, id: item.id },
-                })
-              }
-            >
-              <Text style={{ color: palette.brand, fontWeight: "600" }}>
-                Ver detalhes e gerenciar
-              </Text>
-            </TouchFeedback>
+            {kind === "melhoria" && (
+              <TouchFeedback
+                label="Abrir detalhes do registro"
+                onPress={() =>
+                  router.push({
+                    pathname: "/registro",
+                    params: { kind, id: item.id },
+                  })
+                }
+              >
+                <Text style={{ color: palette.brand, fontWeight: "600" }}>
+                  Ver detalhes e gerenciar
+                </Text>
+              </TouchFeedback>
+            )}
             <Text
               style={[
                 shared.label,
@@ -89,12 +91,14 @@ export function OwnRecordsScreen({ kind }: { kind: "relato" | "melhoria" }) {
                 publicado para a cidade.
               </Text>
             )}
-            <Text style={shared.note}>
-              Atualizado em{" "}
-              {new Date(item.atualizado_em).toLocaleString("pt-BR")}
-            </Text>
+            {kind === "melhoria" && (
+              <Text style={shared.note}>
+                Atualizado em{" "}
+                {new Date(item.atualizado_em).toLocaleString("pt-BR")}
+              </Text>
+            )}
             <TouchFeedback
-              label={open === item.id ? "Fechar histórico" : "Ver histórico"}
+              label={open === item.id ? "Fechar histórico" : "Acompanhar atualizações"}
               onPress={() => setOpen(open === item.id ? null : item.id)}
             >
               <Text style={{ color: palette.brand, fontWeight: "600" }}>

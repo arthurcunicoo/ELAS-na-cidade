@@ -2,7 +2,6 @@ import {listDemonstrations} from "../services/showcase";
 import {demonstrationReports} from "../features/presentation/content";
 import {localPage} from "../lib/pagination";
 import { CollectionState } from "../components/shared/CollectionState";
-import { type Cursor } from "../lib/pagination";
 import { ui, palette, typography, pageContent } from "../constants/theme";
 import { PrimaryButton, SecondaryButton } from "../components/shared/Buttons";
 import { PageHeader } from "../components/shared/PageHeader";
@@ -11,18 +10,16 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { CriticalAlertCard, AlertLocationCard } from "../components/alerts/AlertCards";
-import { listReports } from "../services/reports";
+import { listRecentVerifiedReports, RECENT_REPORT_LIMIT } from "../services/reports";
 import { TouchFeedback } from "../components/TouchFeedback";
 import { usePagedList } from "../features/profile/usePagedList";
 export default function Reports() {
-  const load = useCallback(
-    async (cursor: Cursor | null) => {
-      const page = await listReports(cursor, true);
-      if (page.rows.length || cursor) return page;
-      return localPage(demonstrationReports(await listDemonstrations("relato")));
-    },
-    [],
-  );
+  const load = useCallback(async () => {
+    const reports = await listRecentVerifiedReports();
+    if (reports.length) return localPage(reports);
+    const examples = await listDemonstrations("relato");
+    return localPage(demonstrationReports(examples.slice(0, RECENT_REPORT_LIMIT)));
+  }, []);
   const list = usePagedList(load);
   const presentation = list.rows.some(report => report.demonstracao);
   const open = (id: string) => {
@@ -38,6 +35,11 @@ export default function Reports() {
       <StatusBar style="light" />
       <PageHeader title="Relatos" />
       <View style={styles.page}>
+        <PrimaryButton
+          title="Relatar uma situação"
+          onPress={() => router.push("/novo-relato")}
+          style={styles.reportAction}
+        />
         <View style={styles.actions}>
           <View style={styles.action}>
             <SecondaryButton
@@ -55,17 +57,14 @@ export default function Reports() {
         <FlatList
           data={list.rows}
           keyExtractor={(report) => report.id}
-          initialNumToRender={6}
-          maxToRenderPerBatch={6}
-          windowSize={5}
+          initialNumToRender={RECENT_REPORT_LIMIT}
           contentContainerStyle={styles.scroll}
           refreshing={list.loading}
           onRefresh={list.refresh}
-          onEndReached={list.more}
           ListHeaderComponent={
             <View style={styles.intro}>
               <Text accessibilityRole="header" style={styles.introTitle}>
-                {presentation ? "Relatos de demonstração" : "Na cidade, nas últimas 24h"}
+                {presentation ? "Relatos de demonstração" : "Relatos recentes"}
               </Text>
               <Text style={styles.introText}>
                 {presentation ? "Exemplos fictícios para apresentar o aplicativo. Não são ocorrências verificadas nem alertas reais." : "Ocorrências verificadas da comunidade, da mais recente à mais antiga. A ordem não indica gravidade."}
@@ -86,18 +85,11 @@ export default function Reports() {
             </View>
           }
           ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
-          ListFooterComponent={
-            <PrimaryButton
-              title="Relatar uma situação"
-              onPress={() => router.push("/novo-relato")}
-              style={{ marginTop: 16 }}
-            />
-          }
           ListEmptyComponent={
             <CollectionState
               loading={list.loading}
               error={list.error}
-              title="Nenhum relato público nas últimas 24 horas"
+              title="Nenhum relato verificado"
               message="Os relatos verificados da comunidade aparecerão aqui."
               onRetry={list.refresh}
             />
@@ -124,7 +116,8 @@ export default function Reports() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: palette.background },
   page: { ...pageContent, flex: 1 },
-  actions: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 16, marginBottom: 16 },
+  reportAction: { marginTop: 16 },
+  actions: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginVertical: 12 },
   action: { flexGrow: 1, flexBasis: 140 },
   intro: { gap: 5, marginBottom: 18, paddingHorizontal: 2 },
   introTitle: { color: ui.text, fontSize: typography.input, fontWeight: "600" },

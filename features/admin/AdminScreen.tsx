@@ -1,4 +1,4 @@
-import { AdminFilters, adminStatuses as statuses } from "./AdminFilters";
+import { AdminFilters, adminStatuses, reportDecisionStatuses } from "./AdminFilters";
 import { CollectionState } from "../../components/shared/CollectionState";
 import { LoadingIndicator } from "../../components/loading/LoadingIndicator";
 import { type Cursor } from "../../lib/pagination";
@@ -324,7 +324,7 @@ function AdminContent({ admin }: { admin: boolean }) {
                       { id: "", label: "Automática" },
                       ...placeCategories.filter((c) => c.id !== "all"),
                     ]
-                  : statuses[kind]!.map((s) => ({
+                  : (kind === "relato" ? reportDecisionStatuses : adminStatuses[kind]!).map((s) => ({
                       id: s,
                       label: statusLabels[s],
                     }))

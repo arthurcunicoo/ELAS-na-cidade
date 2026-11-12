@@ -233,6 +233,35 @@ try {
   await db.query('select public.importar_overture($1,$2)',[providerPayload,'2026-09-23.1']);
   check((await db.query("select endereco from public.lugares where id='canonical-test'")).rows[0].endereco==='Endereço confirmado','provider preserves reviewed address');
   await denied("select public.importar_overture(null,'2026-09-23.1')",'empty invalid import rejected');
+
+  const olderReports = (await db.query(`
+    insert into public.relatos(usuario_id,categoria,descricao,local_texto,criado_em,status)
+    select $1,'Outro','Relato anterior verificado','Local '||i,now()-make_interval(days=>i),'verificado'
+    from generate_series(2,5) i returning id,local_texto
+  `,[A])).rows;
+  const denyReport = olderReports.find(row => row.local_texto === 'Local 2');
+  await db.query("update public.relatos set latitude=-28.678,longitude=-49.369 where id=$1",[denyReport.id]);
+  await user(B);
+  const queue = (await db.query("select public.fila_moderacao('relato',null, '{\"status\":\"verificado\"}') page")).rows[0].page;
+  const revision = queue.rows.find(row => row.id === denyReport.id).moderacao_revisao;
+  const deny = () => db.query("select public.moderar_revisao('relato',$1,'negado','Informação não confirmada','verificado',$2)",[denyReport.id,revision]);
+  await user(A);
+  await assert.rejects(deny(), error => error.code === '42501', 'staff cannot deny their own report');
+  await user(B);
+  await deny();
+  await assert.rejects(deny(), error => error.code === '40001', 'a stale denial must not duplicate the decision');
+  const deniedQueue = (await db.query("select public.fila_moderacao('relato',null, '{\"status\":\"negado\"}') page")).rows[0].page;
+  check(deniedQueue.rows.some(row => row.id === denyReport.id), 'staff can filter denied reports');
+  check((await db.query("select public.detalhes_registro('relato',$1) value",[denyReport.id])).rows[0].value === null,'other accounts cannot open a denied report');
+  const latest = await db.query("select local_texto from public.relatos where status='verificado' order by criado_em desc,id desc limit 3");
+  check(latest.rows.map(row => row.local_texto).join(',') === 'Local 3,Local 4,Local 5','public feed can fill three slots with older verified reports');
+  await user(A);
+  const deniedHistory = (await db.query("select public.pagina_app('historico',null,$1) page",[{tipo:'relato',id:denyReport.id}])).rows[0].page;
+  check(deniedHistory.rows.length === 1 && deniedHistory.rows[0].novo === 'negado' &&
+    deniedHistory.rows[0].motivo === 'Informação não confirmada','author can see the denial and its reason in history');
+  check((await db.query("select status from public.relatos where id=$1",[denyReport.id])).rows[0].status === 'negado','author can still see the denied report');
+  check((await db.query("select mensagem from public.notificacoes where registro_id=$1",[denyReport.id])).rows[0].mensagem.includes('Informação não confirmada'),'denial notifies the author');
+  check((await db.query('select public.mapa_relatos(-28.7,-49.4,-28.65,-49.3,15) data')).rows[0].data.total === 0,'denied reports do not appear on the map even for the author');
   console.log(`${passed} database checks passed (PGlite with simulated Auth and Storage roles).`);
 
 } finally { await db.close(); }
