@@ -3653,8 +3653,8 @@ begin
 end $$;
 $elas_m20261110204902$]);
  end if;
- if not exists(select 1 from supabase_migrations.schema_migrations where version='20261112015358') then
-  execute $elas_m20261112015358$alter table public.relatos
+ if not exists(select 1 from supabase_migrations.schema_migrations where version='20261112022724') then
+  execute $elas_m20261112022724$alter table public.relatos
   drop constraint relatos_status_check,
   add constraint relatos_status_check
     check (status in ('pendente','verificado','resolvido','retirado','negado'));
@@ -3717,8 +3717,8 @@ begin
     values(v_usuario,'Atualização de '||p_tipo,'Novo status: '||p_status||'. Motivo: '||btrim(p_motivo),p_tipo,p_id);
 end;
 $$;
-$elas_m20261112015358$;
-  insert into supabase_migrations.schema_migrations(version,name,statements) values('20261112015358','denied_report_status',array[$elas_m20261112015358$alter table public.relatos
+$elas_m20261112022724$;
+  insert into supabase_migrations.schema_migrations(version,name,statements) values('20261112022724','denied_report_status',array[$elas_m20261112022724$alter table public.relatos
   drop constraint relatos_status_check,
   add constraint relatos_status_check
     check (status in ('pendente','verificado','resolvido','retirado','negado'));
@@ -3781,10 +3781,10 @@ begin
     values(v_usuario,'Atualização de '||p_tipo,'Novo status: '||p_status||'. Motivo: '||btrim(p_motivo),p_tipo,p_id);
 end;
 $$;
-$elas_m20261112015358$]);
+$elas_m20261112022724$]);
  end if;
- if not exists(select 1 from supabase_migrations.schema_migrations where version='20261112020954') then
-  execute $elas_m20261112020954$-- Rank factor mentions from the same approved contributions as the map summary.
+ if not exists(select 1 from supabase_migrations.schema_migrations where version='20261112022749') then
+  execute $elas_m20261112022749$-- Rank factor mentions from the same approved contributions as the map summary.
 -- Only catalog factor IDs and aggregate counts are returned.
 create or replace function private.resumos_avaliacoes(p_lugares text[]) returns jsonb
 language plpgsql stable security definer set search_path='' as $$
@@ -3855,8 +3855,8 @@ begin
  ) s left join destaques_por_lugar d on d.lugar_id=s.lugar_id;
  return result;
 end $$;
-$elas_m20261112020954$;
-  insert into supabase_migrations.schema_migrations(version,name,statements) values('20261112020954','review_factor_highlights',array[$elas_m20261112020954$-- Rank factor mentions from the same approved contributions as the map summary.
+$elas_m20261112022749$;
+  insert into supabase_migrations.schema_migrations(version,name,statements) values('20261112022749','review_factor_highlights',array[$elas_m20261112022749$-- Rank factor mentions from the same approved contributions as the map summary.
 -- Only catalog factor IDs and aggregate counts are returned.
 create or replace function private.resumos_avaliacoes(p_lugares text[]) returns jsonb
 language plpgsql stable security definer set search_path='' as $$
@@ -3927,7 +3927,7 @@ begin
  ) s left join destaques_por_lugar d on d.lugar_id=s.lugar_id;
  return result;
 end $$;
-$elas_m20261112020954$]);
+$elas_m20261112022749$]);
  end if;
 end
 $elas_update$;

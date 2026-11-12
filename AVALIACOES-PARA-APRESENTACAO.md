@@ -8,4 +8,4 @@ Cada grupo exibe até três fatores, em ordem de menções. A contagem usa a ava
 
 O resumo público mostra contagens de fatores, com comentários e autoria privados. Os arquivos de avaliações ilustrativas em `supabase/` são dados de teste.
 
-O build web precisa da migration `20261112020954_review_factor_highlights.sql` no Supabase para exibir os destaques.
+O build web precisa da migration `20261112022749_review_factor_highlights.sql` no Supabase para exibir os destaques.
