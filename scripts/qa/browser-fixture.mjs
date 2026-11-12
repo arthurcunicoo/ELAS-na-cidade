@@ -24,12 +24,10 @@ export async function browserFixture(sourceRoot=process.cwd()) {
  };`;
  const html=`<!doctype html><html><head><meta charset="utf-8"><title>ELAS storage QA</title></head>
  <body><p id="status">Loading isolated storage fixture</p>
- <script>globalThis.process={env:{EXPO_PUBLIC_SUPABASE_URL:'fixture'}};</script>
  <script type="module">
  import {protectedStorage} from './protectedStorage.js';
- import raw from './raw.js';
- import {createPublicOfflineStore} from './publicOffline.js';
- window.storage=protectedStorage;window.publicStore=createPublicOfflineStore(raw,'fixture');
+ import {publicOfflineStore} from './publicOffline.js';
+ window.storage=protectedStorage;window.publicStore=publicOfflineStore;
  document.getElementById('status').textContent='Ready';
  </script></body></html>`;
  const server=http.createServer((req,res)=>{
@@ -38,12 +36,14 @@ export async function browserFixture(sourceRoot=process.cwd()) {
    let body,type='text/javascript';
    if(name===''||name==='fixture'){body=html;type='text/html';}
    else if(name==='raw.js')body=raw;
+   else if(name==='backendConfig.js')body='export const backendConfig = { url: "fixture" };';
    else if(sources[name]){
     const file=path.join(sourceRoot,sources[name]);
     body=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.ES2022,target:ts.ScriptTarget.ES2022}}).outputText
      .replaceAll('"@react-native-async-storage/async-storage"','"./raw.js"')
      .replaceAll('"./protectedStore"','"./protectedStore.js"')
-     .replaceAll('"./webStorageLock"','"./webStorageLock.js"');
+     .replaceAll('"./webStorageLock"','"./webStorageLock.js"')
+     .replaceAll('"./backendConfig"','"./backendConfig.js"');
    }else{res.writeHead(404);res.end();return;}
    res.writeHead(200,{'Content-Type':type+'; charset=utf-8','Cache-Control':'no-store'});res.end(body);
   }catch{res.writeHead(500);res.end('Fixture source unavailable');}

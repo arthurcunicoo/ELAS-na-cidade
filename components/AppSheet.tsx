@@ -1,5 +1,5 @@
 import { colors, glass, glassShadow, ui, palette, radius, typography, layout } from "../constants/theme";
-import { type ComponentProps, type ReactNode } from "react";
+import { type ComponentProps, type ReactNode, useId } from "react";
 import { Animated, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Ionicons from "./icons/Ionicon";
@@ -35,12 +35,15 @@ export function AppSheet({
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const compact = width <= 600;
+  const titleId = useId();
+  const webLabel = Platform.OS === "web" ? { "aria-labelledby": titleId } : {};
   const { present, progress: entrance, reduced } = useSheetTransition(visible);
   const close = () => {
     if (dismissible) onClose();
   };
   return (
     <Modal
+      {...webLabel}
       visible={present}
       transparent
       animationType="none"
@@ -121,7 +124,7 @@ export function AppSheet({
                   </View>
                 ) : null}
                 <View style={styles.heading}>
-                  <Text accessibilityRole="header" style={styles.title}>
+                  <Text nativeID={titleId} accessibilityRole="header" style={styles.title}>
                     {title}
                   </Text>
                   {!!subtitle && (

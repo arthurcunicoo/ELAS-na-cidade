@@ -8,6 +8,7 @@ const browser = await chromium.launch({headless:true,executablePath:process.env.
 const base = process.env.QA_WELCOME_URL??'http://localhost:8086', checks=[];
 const uid='11111111-1111-4111-8111-111111111111', placeId='qa-place';
 const place={id:placeId,nome:'Praça de teste',endereco:'Centro',latitude:-28.678,longitude:-49.369,tags:{leisure:'park'},ativo:true};
+const event={id:'qa-event',titulo:'Caminhada de teste no centro',descricao:'Evento de teste isolado.',local_texto:'Centro',inicia_em:new Date(Date.now()+86400000).toISOString(),cancelado:false,inscrito:false};
 const policy={versao:2,metodo:'Percepções comunitárias aprovadas; mínimo de uma avaliação.'};
 const now=()=>new Date().toISOString();
 let debugPage,debugUnknown;
@@ -44,7 +45,11 @@ try {
    if(name==='perfis')return request.method()==='POST'?route.fulfill({status:204,body:''}):reply({nome:'Pessoa de teste',avatar_url:null});
    if(name==='service_areas')return reply([{id:'qa',nome:'Criciúma',estado:'SC',timezone:'America/Sao_Paulo',south:-28.85,north:-28.55,west:-49.55,east:-49.2,latitude:-28.678,longitude:-49.369,latitude_delta:.02,longitude_delta:.02}]);
    if(name==='minha_participacao')return reply({avaliacoes:own?1:0,relatos:0,melhorias:0,inscricoes:0});
-   if(name==='pagina_app')return reply({rows:args.p_lista==='avaliacoes'?[...savedReviews].reverse():[],nextCursor:null});
+   if(name==='pagina_app'){
+    const rows=args.p_lista==='avaliacoes'?[...savedReviews].reverse():
+     args.p_lista==='eventos'&&!args.p_filtros?.passados?[event]:[];
+    return reply({rows,nextCursor:null});
+   }
    if(name==='mapa_lugares')return reply({places:[place],warning:'',refreshing:false});
    if(name==='mapa_relatos')return reply({total:0,nodes:[]});
    if(name==='relatos'){
@@ -146,6 +151,11 @@ try {
   };
   const before=await page.getByTestId('nav-events').boundingBox();
   await trace(page.getByTestId('nav-events'),'eventos');
+  await page.getByRole('button',{name:'Ver detalhes: '+event.titulo,exact:true}).click();
+  const eventDialog=page.getByRole('dialog',{name:'Detalhes do evento',exact:true});
+  await eventDialog.waitFor();
+  await page.keyboard.press('Escape');
+  await eventDialog.waitFor({state:'hidden'});
   const after=await page.getByTestId('nav-events').boundingBox();assert.ok(Math.abs(before.y-after.y)<=1);
   if(process.env.QA_TAB_SCREENSHOTS){await mkdir(process.env.QA_TAB_SCREENSHOTS,{recursive:true});await page.screenshot({path:process.env.QA_TAB_SCREENSHOTS+'/events-'+viewport.width+'.png'});}
   const eventButton=page.getByTestId('events-tab-events'),pollButton=page.getByTestId('events-tab-polls');

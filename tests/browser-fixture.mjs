@@ -10,6 +10,11 @@ try {
  }
  const adapter=await (await fetch(fixture.url+'/protectedStorage.js')).text();
  assert.ok(adapter.includes('./webStorageLock.js'));assert.ok(adapter.includes('./protectedStore.js'));
+ const offline=await (await fetch(fixture.url+'/publicOffline.js')).text();
+ assert.ok(offline.includes('./backendConfig.js'));
+ const config=await fetch(fixture.url+'/backendConfig.js');
+ assert.equal(config.status,200);
+ assert.match(await config.text(),/export const backendConfig = \{ url: "fixture" \}/);
  assert.equal((await fetch(fixture.url+'/package.json')).status,404,'fixture must not expose project files');
  console.log('Browser fixture HTTP checks passed: real production TypeScript compiled, local raw-storage boundary, module routes and private file rejection. This does not execute Chromium or prove E2E.');
 } finally {await fixture.close();}
