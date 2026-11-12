@@ -12,11 +12,14 @@ import {
 
 const nativeDriver = Platform.OS !== "web";
 const webEntrance = `
-    [data-city-entrance="loading"] {
+    [data-city-entrance="loading"], [data-city-entrance="posed"] {
       transform: translateY(95px);
     }
     [data-city-entrance="ready"] {
-      animation: elas-city-rise 760ms cubic-bezier(.18,.68,.24,1) both;
+      animation: elas-city-rise 1000ms cubic-bezier(.32,.16,.36,1) both;
+    }
+    [data-city-layout="ready"] {
+      transition: transform 750ms cubic-bezier(.32,.16,.36,1);
     }
     @keyframes elas-city-rise {
       from { transform: translateY(95px); }
@@ -25,9 +28,21 @@ const webEntrance = `
 
     @media (prefers-reduced-motion: reduce) {
       [data-city-entrance] {
-        animation: none;
         transform: none;
       }
+      [data-city-entrance="posed"] {
+        opacity: 0.45;
+      }
+      [data-city-entrance="ready"] {
+        animation: elas-city-appear 400ms ease-out both;
+      }
+      [data-city-layout="ready"] {
+        transition: none;
+      }
+    }
+    @keyframes elas-city-appear {
+      from { opacity: 0.45; }
+      to { opacity: 1; }
     }
 `;
 
@@ -37,7 +52,16 @@ export function CitySkyline() {
   const reduced = useReducedMotion();
   const [onboardingDone, setOnboardingDone] = useState(isOnboardingCompleted);
   const [imageReady, setImageReady] = useState(false);
+  const [canRise, setCanRise] = useState(false);
   useEffect(() => subscribeOnboardingState(setOnboardingDone), []);
+  useEffect(() => {
+    if (nativeDriver || !imageReady) return;
+    // Paint the loaded artwork in its lowered position before starting the rise.
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => setCanRise(true));
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [imageReady]);
   const isWelcome =
     path === "/" ||
     ((path === "/login" || path === "/cadastro") && !onboardingDone);
@@ -66,7 +90,10 @@ export function CitySkyline() {
     return () => animation.stop();
   }, [offset, reduced, top]);
   const webProps = nativeDriver ? {} : {
-    dataSet: { cityEntrance: imageReady ? "ready" : "loading" },
+    dataSet: { cityEntrance: canRise ? "ready" : imageReady ? "posed" : "loading" },
+  };
+  const webLayoutProps = nativeDriver ? {} : {
+    dataSet: { cityLayout: imageReady ? "ready" : "loading" },
   };
   return (
     <View
@@ -75,6 +102,7 @@ export function CitySkyline() {
     >
       {!nativeDriver && createElement("style", null, webEntrance)}
       <Animated.View
+        {...webLayoutProps}
         testID="city-motion"
         style={{ transform: [{ translateY: nativeDriver ? offset : top }] }}
       >

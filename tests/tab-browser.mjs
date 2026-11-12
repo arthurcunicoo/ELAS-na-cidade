@@ -79,12 +79,31 @@ try {
    const sample=()=>{
     const city=document.querySelector('[data-city-entrance="ready"]');
     if(city) window.__cityPositions.push(new DOMMatrixReadOnly(getComputedStyle(city).transform).m42);
-    if(window.__cityPositions.length<70) requestAnimationFrame(sample);
+    if(!window.__cityPositions.includes(0)) requestAnimationFrame(sample);
    };
    requestAnimationFrame(sample);
   });
-  await page.goto(base+'/login',{waitUntil:'domcontentloaded'});
+  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>window.__cityPositions.some(y=>y>40)&&window.__cityPositions.some(y=>y>2&&y<30)&&window.__cityPositions.includes(0));
+  const skyline=page.getByTestId('city-motion');
+  const from=await skyline.evaluate(node=>node.getBoundingClientRect().y);
+  await skyline.evaluate(node=>{
+   window.__cityLayoutPositions=[];
+   window.__trackCityLayout=true;
+   const sample=()=>{
+    if(!window.__trackCityLayout)return;
+    window.__cityLayoutPositions.push(node.getBoundingClientRect().y);
+    requestAnimationFrame(sample);
+   };
+   requestAnimationFrame(sample);
+  });
+  await page.getByTestId('welcome-start').click();
+  await page.waitForURL('**/login');
+  await page.waitForFunction(()=>document.querySelector('[data-testid="city-motion"]')?.getAnimations().length===0);
+  const to=await skyline.evaluate(node=>node.getBoundingClientRect().y);
+  const layoutFrames=await page.evaluate(()=>{window.__trackCityLayout=false;return window.__cityLayoutPositions;});
+  assert.ok(to<from-30,'the login skyline finishes above its welcome position');
+  assert.ok(layoutFrames.some(y=>y<from-20&&y>to+20),'the skyline paints intermediate positions from welcome to login');
   await page.getByTestId('auth-email').fill('browser-qa@example.invalid',{timeout:90000});
   await page.getByTestId('auth-password').fill('local-fixture-only');
   await page.getByRole('button',{name:'Entrar',exact:true}).click();
