@@ -10,7 +10,7 @@ import {
 } from "../../constants/theme";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { communityMoods, type ReviewSummary } from "../../constants/community";
+import { communityMoods, type ReviewFactorMention, type ReviewSummary } from "../../constants/community";
 
 import { TouchFeedback } from "../TouchFeedback";
 const moodColors = {
@@ -18,6 +18,27 @@ const moodColors = {
   Moderada: statusText.moderate,
   Cuidado: statusText.danger,
 };
+function FactorHighlights({
+  title, source, mentions,
+}: {
+  title: string;
+  source: string;
+  mentions?: ReviewFactorMention[];
+}) {
+  if (!mentions?.length) return null;
+  return (
+    <View style={styles.factors}>
+      <Text accessibilityRole="header" style={styles.factorTitle}>{title}</Text>
+      <Text style={styles.note}>{source}</Text>
+      {mentions.map(({ label, count }) => (
+        <View key={label} style={styles.factorRow}>
+          <Text style={styles.factorLabel}>{label}</Text>
+          <Text style={styles.mentions}>{count} {count === 1 ? "menção" : "menções"}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
 export function CommunityReviewSummary({
   summary,
   unavailable,
@@ -145,6 +166,16 @@ export function CommunityReviewSummary({
                 : "Este lugar ainda não tem avaliações aprovadas neste período. Sua participação pode ajudar."}
             </Text>
           )}
+          <FactorHighlights
+            title="Pontos fortes mais citados"
+            source="Nas avaliações marcadas como Segura"
+            mentions={summary.highlights?.strengths}
+          />
+          <FactorHighlights
+            title="Pontos de atenção mais citados"
+            source="Nas avaliações marcadas como Moderada ou Cuidado"
+            mentions={summary.highlights?.attention}
+          />
           <Text style={styles.note}>
             São percepções da comunidade; não garantem segurança. Comentários e
             autoria ficam privados.
@@ -239,4 +270,16 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: ui.muted,
   },
+  factors: {
+    gap: 7,
+    backgroundColor: glass.surfaceSoft,
+    borderRadius: radius.medium,
+    borderWidth: 1,
+    borderColor: glass.tintedBorder,
+    padding: 12,
+  },
+  factorTitle: { fontSize: typography.body, fontWeight: "700", color: ui.text },
+  factorRow: { flexDirection: "row", alignItems: "baseline", gap: 10 },
+  factorLabel: { flex: 1, fontSize: typography.secondary, color: ui.text },
+  mentions: { fontSize: typography.caption, fontWeight: "600", color: ui.muted },
 });

@@ -10,16 +10,14 @@ export function PlaceHeader({
   place,
   expanded,
   onToggle,
-  exampleStatus,
 }: {
   place: Place;
   expanded: boolean;
   onToggle?: () => void;
-  exampleStatus?: Exclude<Place["status"], "unknown">;
 }) {
-  const status = exampleStatus ?? place.status;
+  const status = place.status;
   const category = categoryForPlace(place),
-    perception = communityPresentation(exampleStatus ? { ...place, status, demonstration: false, reviewSummary: undefined, reviewsUnavailable: false } : place),
+    perception = communityPresentation(place),
     statusColor = perception.color;
   return (
     <TouchFeedback
@@ -63,7 +61,7 @@ export function PlaceHeader({
             color={statusColor}
           />
           <Text style={[styles.statusText, { color: statusColor }]}>
-            {perception.label}{exampleStatus ? " · apresentação" : ""}
+            {perception.label}
           </Text>
         </View>
       </View>

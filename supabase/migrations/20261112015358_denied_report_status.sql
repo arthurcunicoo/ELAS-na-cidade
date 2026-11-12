@@ -14,8 +14,10 @@ declare
   v_papel text := private.meu_papel();
 begin
   /* elas_active_account_guard */
-  if not (select private.conta_disponivel()) then
-    raise exception 'Conta indisponível' using errcode='42501';
+  if to_regprocedure('private.conta_disponivel()') is not null then
+    if not (select private.conta_disponivel()) then
+      raise exception 'Conta indisponível' using errcode='42501';
+    end if;
   end if;
   /* elas_active_account_guard_end */
   if auth.uid() is null or v_papel not in ('moderador','admin') then

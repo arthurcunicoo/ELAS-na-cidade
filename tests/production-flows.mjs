@@ -57,6 +57,17 @@ assert.throws(()=>reviews.parseReviewSummaries([{...raw('bad'),propria:{sentimen
 assert.throws(()=>reviews.parseReviewSummaries([{...raw('bad'),propria:{sentimento:'Segura',status:'rejeitada'}}]));
 const oneApproved=reviews.parseReviewSummaries([raw('single',1,[1,0,0])]).get('single');
 assert.equal(community.communityStatus(oneApproved),'safe');
+assert.equal(oneApproved.highlights,undefined,'an older backend still renders a valid rating summary');
+const factorSummary=reviews.parseReviewSummaries([{
+  ...raw('factors',5),destaques:{
+    fortes:[{fator:'movimento',total:1},{fator:'iluminacao',total:3},{fator:'assedio',total:4}],
+    atencao:[{fator:'assedio',total:1},{fator:'movimento',total:2},{fator:'Texto privado',total:1}],
+  },
+}]).get('factors');
+assert.deepEqual(factorSummary.highlights,{
+  strengths:[{label:'Boa iluminação',count:3},{label:'Movimento de pessoas',count:1}],
+  attention:[{label:'Assédio ou importunação',count:1}],
+});
 assert.equal(community.communityPresentation({...place,status:'safe',reviewSummary:oneApproved}).label,'Seguro');
 assert.equal(community.communityStatus(sample()),'safe');
 assert.equal(community.communityStatus(sample(10,[7,2,1])),'safe');
@@ -217,15 +228,20 @@ try {
   assert.deepEqual(renderer.root.findAllByType('TouchFeedback').map(n=>n.props.label),['Segura','Moderada','Cuidado']);
   await act(async()=>renderer.root.findAllByType('TouchFeedback')[2].props.onPress());assert.deepEqual(moods,['Cuidado']);await unmount();
   const {CommunityReviewSummary}=load('../components/map/CommunityReviewSummary.tsx',{'../loading/LoadingIndicator':{LoadingIndicator:props=>React.createElement('LoadingIndicator',props)},'../../constants/community':community,'../../constants/theme':theme,'../TouchFeedback':{TouchFeedback:touch}});
-  await mount(React.createElement(CommunityReviewSummary,{summary:sample(),expanded:true,onExpand(){}}));
+  await mount(React.createElement(CommunityReviewSummary,{summary:factorSummary,expanded:true,onExpand(){}}));
   assert.ok(text().includes('5 avaliações aprovadas nos últimos 180 dias'));
   assert.ok(text().includes('Comentários e autoria ficam privados'));
+  assert.ok(text().includes('Pontos fortes mais citados') && text().includes('3 menções'));
+  assert.ok(text().indexOf('Boa iluminação') < text().indexOf('Movimento de pessoas'));
+  assert.ok(text().includes('Pontos de atenção mais citados') && text().includes('Assédio ou importunação'));
+  assert.ok(!text().includes('Texto privado'));
   assert.ok(!text().includes('demonstração'));
   assert.equal(renderer.root.findAll(n=>n.type==='View'&&n.props.accessibilityLabel?.includes('por cento')).length,3);
   await act(async()=>renderer.root.findAll(n=>n.type==='TouchFeedback'&&n.props.label==='Como o resumo é calculado')[0].props.onPress());
   assert.ok(text().includes('70%'));assert.ok(text().includes('50%'));
   await act(async()=>renderer.update(React.createElement(CommunityReviewSummary,{summary:empty,expanded:true,onExpand(){}})));
-  assert.ok(text().includes('ainda não tem avaliações aprovadas'));await unmount();
+  assert.ok(text().includes('ainda não tem avaliações aprovadas'));
+  assert.ok(!text().includes('Pontos fortes mais citados'));await unmount();
   await mount(React.createElement(CommunityReviewSummary,{summary:ownPending,expanded:true,onExpand(){}}));
   assert.ok(text().includes('Sua avaliação: Cuidado'));assert.ok(text().includes('aguardando análise'));assert.ok(text().includes('0 avaliações aprovadas'));await unmount();
 

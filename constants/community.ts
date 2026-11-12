@@ -2,6 +2,7 @@ import type { Place } from "./places";
 import { statusText, ui } from "./theme";
 export const communityMoods = ["Segura", "Moderada", "Cuidado"] as const;
 export type CommunityMood = (typeof communityMoods)[number];
+export type ReviewFactorMention = { label: string; count: number };
 export type ReviewSummary = {
   classification: Place["status"];
   policyVersion: number;
@@ -10,6 +11,7 @@ export type ReviewSummary = {
   minimum: number;
   windowDays: number;
   distribution: Record<CommunityMood, number> | null;
+  highlights?: { strengths: ReviewFactorMention[]; attention: ReviewFactorMention[] };
   lastContribution: string | null;
   ownReview?: { mood: CommunityMood; status: "pendente" | "aprovada" } | null;
 };
@@ -62,6 +64,7 @@ export function equalReviewSummary(a?: ReviewSummary, b?: ReviewSummary) {
       a.windowDays === b.windowDays &&
       a.lastContribution === b.lastContribution &&
       JSON.stringify(a.ownReview) === JSON.stringify(b.ownReview) &&
+      JSON.stringify(a.highlights) === JSON.stringify(b.highlights) &&
       JSON.stringify(a.distribution) === JSON.stringify(b.distribution))
   );
 }

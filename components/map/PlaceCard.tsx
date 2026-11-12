@@ -8,9 +8,6 @@ import { colors } from "../../constants/theme";
 
 import { useCatalog } from "../../features/map/CatalogProvider";
 import { PlaceReviewPreview } from "./PlaceReviewPreview";
-import { RecentReviewExamples } from "./RecentReviewExamples";
-import { usePresentationReviews } from "../../features/reviews/usePresentationReviews";
-import { presentationClassification } from "../../features/reviews/presentationReviews";
 import { useEffect, useMemo, useState } from "react";
 import { Animated, Linking, ScrollView, Text, View, useWindowDimensions } from "react-native";
 import Ionicons from "../icons/Ionicon";
@@ -46,8 +43,6 @@ export function PlaceCard({
     place,
     expanded,
   );
-  const examples = usePresentationReviews(shown?.id);
-  const exampleOnly = !!examples.rows.length && !shown?.reviewsUnavailable && shown?.reviewSummary?.total === 0 && !shown.reviewSummary.ownReview;
   useEffect(() => {
     setLinkError("");
   }, [shown?.id]);
@@ -94,20 +89,16 @@ export function PlaceCard({
         contentContainerStyle={styles.content}
       >
         <Animated.View style={{ opacity: content }}>
-          <PlaceHeader place={shown} expanded={expanded} onToggle={onToggle} exampleStatus={exampleOnly ? presentationClassification(examples.rows) : undefined} />
+          <PlaceHeader place={shown} expanded={expanded} onToggle={onToggle} />
         </Animated.View>
-        {!exampleOnly && <PlaceReviewPreview
+        <PlaceReviewPreview
           key={shown.id}
           summary={shown.reviewSummary}
           unavailable={shown.reviewsUnavailable}
           onRefresh={(signal) => ensurePlace(shown.id, signal)}
           expanded={expanded}
           onExpand={() => onToggle?.()}
-        />}
-        {examples.enabled && (exampleOnly || expanded) && <RecentReviewExamples
-          reviews={examples.rows} loading={examples.loading} error={examples.error}
-          expanded={expanded} onExpand={() => onToggle?.()} onRetry={examples.retry}
-        />}
+        />
         {expanded && (
           <>
             <PlaceMedia

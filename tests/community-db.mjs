@@ -7,7 +7,8 @@ const asUser = async id => db.exec(`reset role;set role authenticated;select set
 const denied = async sql => { let error; try { await db.exec(sql); } catch(e) { error=e; } assert.ok(error, sql); };
 const summary = async () => (await db.query("select public.resumos_avaliacoes(array['nereu']) data")).rows[0].data[0];
 const moderate = async (id, before, status) => { await asUser(ADMIN); await db.query('select public.moderar($1,$2,$3,$4,$5)',['avaliacao',id,status,'Decisão de teste justificada',before]); };
-async function review(user, mood='Segura') { await asUser(user); return (await db.query("select public.salvar_avaliacao('nereu',$1,'Comentário privado de teste',array['iluminacao']) id",[mood])).rows[0].id; }
+async function review(user, mood='Segura', factors=['iluminacao']) { await asUser(user); return (await db.query("select public.salvar_avaliacao('nereu',$1,'Comentário privado de teste',$2) id",[mood,factors])).rows[0].id; }
+const mention = (fator,total) => ({fator,total});
 try {
  await db.exec(`create role anon;create role authenticated;create role service_role bypassrls;create schema auth;create table auth.users(id uuid primary key);
  create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
@@ -23,12 +24,21 @@ try {
  await asUser(null);await denied("select public.resumos_avaliacoes(array['nereu'])");
  await asUser(B);assert.equal((await summary()).total,0);
  await denied("select public.resumos_avaliacoes(array_fill('nereu'::text,array[601]))");await denied("select public.resumos_avaliacoes(array[null]::text[])");
- const first = await review(A);await asUser(B);assert.equal((await summary()).total,0,'pending review cannot enter the public summary');
+ const first = await review(A,'Segura',['iluminacao','movimento','acessibilidade','limpeza','assedio','outro']);
+ await asUser(B);assert.equal((await summary()).total,0,'pending review cannot enter the public summary');
+ assert.equal((await summary()).destaques,null);
  await moderate(first,'pendente','aprovada');await asUser(B);
  let data = await summary();assert.equal(data.total,1);assert.deepEqual(data.distribuicao,{Segura:1,Moderada:0,Cuidado:0});assert.ok(data.ultima_contribuicao);
+ assert.deepEqual(data.destaques,{fortes:[mention('iluminacao',1),mention('movimento',1),mention('acessibilidade',1)],atencao:[]});
  assert.equal((await db.query('select count(*)::int n from public.avaliacoes')).rows[0].n,0,'another author cannot read the newly approved raw review');
- const reviewed=[first];for(const [user,mood] of [[B,'Segura'],[C,'Segura'],[D,'Segura'],[E,'Atenção']]){const id=await review(user,mood);reviewed.push(id);await moderate(id,'pendente','aprovada');}
+ const reviewed=[first];
+ for(const [user,mood,factors] of [
+  [B,'Segura',['movimento','assedio']], [C,'Segura',['movimento','limpeza']],
+  [D,'Segura',['movimento','iluminacao']], [E,'Atenção',['assedio','iluminacao']],
+ ]){const id=await review(user,mood,factors);reviewed.push(id);await moderate(id,'pendente','aprovada');}
  await asUser(G);data=await summary();assert.equal(data.total,5);assert.deepEqual(data.distribuicao,{Segura:4,Moderada:0,Cuidado:1});assert.ok(data.ultima_contribuicao);
+ const approvedHighlights={fortes:[mention('movimento',4),mention('iluminacao',2),mention('limpeza',2)],atencao:[mention('iluminacao',1),mention('assedio',1)]};
+ assert.deepEqual(data.destaques,approvedHighlights,'rank three factors, ignore generic other and never count harassment as a strength');
  assert.ok(!JSON.stringify(data).includes('comentario')&&!JSON.stringify(data).includes('usuario_id')&&!JSON.stringify(data).includes('Comentário privado'));
  assert.equal((await db.query("select jsonb_array_length(public.resumos_avaliacoes(array['nereu','nereu','missing'])) n")).rows[0].n,1,'duplicate and missing place IDs are bounded safely');
  // Change policy in a rolled-back fixture: aggregate and explanation must follow together.
@@ -42,6 +52,7 @@ try {
  await db.exec('reset role;begin;savepoint policy');
  await db.exec('update private.politica_avaliacoes set versao=2,minimo=8,janela_dias=90,limiar_favoravel=.8,limiar_atencao=.6');
  await asUser(G);data=await summary();assert.equal(data.minimo,8);assert.equal(data.janela_dias,90);assert.equal(data.classificacao,'unknown');assert.equal(data.distribuicao,null);assert.equal(data.politica.versao,2);assert.ok(data.politica.metodo.includes('80%'));
+ assert.equal(data.destaques,null,'highlights follow the same publication threshold as the distribution');
  for(const user of [F,G,H]){const extra=await review(user,'Moderada');await moderate(extra,'pendente','aprovada');}
  await asUser(G);data=await summary();assert.equal(data.total,8);assert.equal(data.classificacao,'moderate');
  await db.exec('reset role;update private.politica_avaliacoes set limiar_favoravel=.5');await asUser(G);data=await summary();assert.equal(data.classificacao,'safe');assert.ok(data.politica.metodo.includes('50%'));
@@ -50,19 +61,22 @@ try {
  await db.exec('reset role');await db.query("update public.avaliacoes set contribuida_em=now()-interval '100 days' where id=$1",[first]);await asUser(G);data=await summary();assert.equal(data.total,7);assert.equal(data.distribuicao,null);assert.equal(data.classificacao,'unknown');
  await db.exec('rollback to policy;rollback');
  await asUser(A);await denied("update public.avaliacoes set contribuida_em=now()+interval '5 days'");
- const newer=await review(A,'Cuidado');
+ const newer=await review(A,'Cuidado',['assedio']);
  const myReviews=(await db.query("select public.pagina_app('avaliacoes',null,'{}'::jsonb) data")).rows[0].data.rows;
  assert.deepEqual(myReviews.map(r=>[r.id,r.sentimento,r.status]),[[newer,'Cuidado','pendente'],[first,'Segura','aprovada']],'the private history retains both submissions with their own moderation states');
  assert.deepEqual((await summary()).propria,{sentimento:'Cuidado',status:'pendente'},'own indicator uses the latest submission even with multiple records');
  await asUser(G);data=await summary();
  assert.equal(data.total,5,'new pending review leaves the previous approved contribution in place');
  assert.deepEqual(data.distribuicao,{Segura:4,Moderada:0,Cuidado:1});
+ assert.deepEqual(data.destaques,approvedHighlights,'pending changes cannot replace approved factors');
  assert.equal(data.propria,null,'other users cannot see the pending submission');
  await moderate(newer,'pendente','aprovada');await asUser(G);data=await summary();
  assert.equal(data.total,5,'two approved reviews from the same account count once');
  assert.deepEqual(data.distribuicao,{Segura:3,Moderada:0,Cuidado:2},'newest approved review determines the contribution');
+ assert.deepEqual(data.destaques,{fortes:[mention('movimento',3),mention('iluminacao',1),mention('limpeza',1)],atencao:[mention('assedio',2),mention('iluminacao',1)]},'approved replacements change the ranks and cannot double-count a contributor');
  await moderate(newer,'aprovada','rejeitada');await asUser(G);data=await summary();
  assert.deepEqual(data.distribuicao,{Segura:4,Moderada:0,Cuidado:1},'previous approved review can count again after rejection of the newer one');
+ assert.deepEqual(data.destaques,approvedHighlights);
  await moderate(reviewed[1],'aprovada','rejeitada');await asUser(G);assert.equal((await summary()).total,4,'rejection takes effect without a rebuild');
  await asUser(C);await db.query('delete from public.avaliacoes where id=$1',[reviewed[2]]);await asUser(G);assert.equal((await summary()).total,3,'author withdrawal removes the contribution');
  const old=await review(F);await db.exec('reset role');await db.query("update public.avaliacoes set contribuida_em=now()-interval '181 days' where id=$1",[old]);

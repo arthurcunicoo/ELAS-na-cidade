@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict';
 import {mkdir, writeFile} from 'node:fs/promises';
-import {readFileSync} from 'node:fs';
 import {chromium} from 'playwright';
 
 // Run the actual Expo app. Every Supabase request is intercepted: synthetic
@@ -11,9 +10,6 @@ const uid='11111111-1111-4111-8111-111111111111', placeId='qa-place';
 const place={id:placeId,nome:'Praça de teste',endereco:'Centro',latitude:-28.678,longitude:-49.369,tags:{leisure:'park'},ativo:true};
 const policy={versao:2,metodo:'Percepções comunitárias aprovadas; mínimo de uma avaliação.'};
 const now=()=>new Date().toISOString();
-const reviewFixtures=JSON.parse(readFileSync(new URL('../supabase/avaliacoes-apresentacao.json',import.meta.url),'utf8'));
-const examplesEnabled=process.env.EXPO_PUBLIC_APP_ENV==='presentation'&&process.env.EXPO_PUBLIC_REVIEW_EXAMPLES==='1';
-const fixturePlaces=new Map([[placeId,place],...reviewFixtures.map(row=>[row.lugar_id,{...place,id:row.lugar_id,nome:row.local_texto}])]);
 let debugPage,debugUnknown;
 const viewports=process.env.QA_TAB_DESKTOP==='1'
  ? [{width:1440,height:900},{width:1920,height:1080}]
@@ -58,15 +54,13 @@ try {
     assert.equal(url.searchParams.get('limit'),'3');
     return reply([]);
    }
-   if(name==='resolver_lugar')return reply([fixturePlaces.get(args.p_id)??place]);
-   if(name==='conteudos_demonstracao'){
-    assert.equal(examplesEnabled,true,'normal builds must not request presentation reviews');
-    assert.equal(url.searchParams.get('ficticio'),'eq.true');
-    assert.equal(url.searchParams.get('id'),'like.demo:apresentacao-avaliacao:%');
-    const placeId=url.searchParams.get('lugar_id')?.slice(3);
-    return reply(reviewFixtures.filter(row=>row.lugar_id===placeId).map(row=>({...row,tipo:'avaliacao',ativo:true,ficticio:true,criado_em:now()})));
+   if(name==='resolver_lugar')return reply([place]);
+   if(name==='resumos_avaliacoes'){
+    const destaques=approved==='Segura'
+     ? {fortes:[{fator:'iluminacao',total:1}],atencao:[]}
+     : approved ? {fortes:[],atencao:[{fator:'assedio',total:1}]} : null;
+    return reply({politica:policy,resumos:(args.p_lugares??[]).map(id=>({lugar_id:id,total:approved?1:0,minimo:1,janela_dias:180,classificacao:approved==='Segura'?'safe':approved==='Moderada'?'moderate':approved==='Cuidado'?'attention':'unknown',distribuicao:approved?{Segura:approved==='Segura'?1:0,Moderada:approved==='Moderada'?1:0,Cuidado:approved==='Cuidado'?1:0}:null,destaques,ultima_contribuicao:approved?now():null,propria:own?{sentimento:own,status:'pendente'}:null}))});
    }
-   if(name==='resumos_avaliacoes')return reply({politica:policy,resumos:(args.p_lugares??[]).map(id=>({lugar_id:id,total:approved?1:0,minimo:1,janela_dias:180,classificacao:approved==='Segura'?'safe':approved==='Moderada'?'moderate':approved==='Cuidado'?'attention':'unknown',distribuicao:approved?{Segura:approved==='Segura'?1:0,Moderada:approved==='Moderada'?1:0,Cuidado:approved==='Cuidado'?1:0}:null,ultima_contribuicao:approved?now():null,propria:own?{sentimento:own,status:'pendente'}:null}))});
    if(name==='fatores')return reply([{id:'iluminacao',nome:'Iluminação'}]);
    if(name==='criar_avaliacao'){
     assert.match(args.p_chave,/^[0-9a-f-]{36}$/i);
@@ -180,37 +174,15 @@ try {
   for(const [mood,label] of [['Segura','Seguro'],['Moderada','Moderado'],['Cuidado','Cuidado']]) {
    approved=mood;await page.reload({waitUntil:'domcontentloaded'});
    await page.getByText(label,{exact:true}).first().waitFor({timeout:60000});
+   const expand=page.getByRole('button',{name:'Ver detalhes de '+place.nome,exact:true});
+   if(await expand.isVisible())await expand.click();
+   const factor=page.getByText(mood==='Segura'?'Boa iluminação':'Assédio ou importunação',{exact:true});
+   await factor.waitFor();
+   const bounds=await factor.boundingBox();
+   assert.ok(bounds.x>=0&&bounds.x+bounds.width<=viewport.width+1,'factor rows fit a small phone viewport');
+   assert.equal(await page.getByText('Minha primeira visita',{exact:true}).count(),0,'the public map only shows aggregates');
   }
-  const examplePlaces=[];
-  if(examplesEnabled){
-   own=null;approved=null;
-   for(const [id,label] of [['nereu','Seguro'],['congresso','Moderado'],['osm:way:453621835','Cuidado'],['osm:node:9478440538','Seguro'],['overture:52e7790c-14ed-4ddb-9e02-82ff0e8985f8','Moderado']]){
-    await page.goto(base+'/mapa?placeId='+encodeURIComponent(id),{waitUntil:'domcontentloaded'});
-    await page.getByText(label+' · apresentação',{exact:true}).waitFor({timeout:60000});
-    const name=fixturePlaces.get(id).nome;
-    const expand=page.getByRole('button',{name:'Ver detalhes de '+name,exact:true});
-    if(await expand.isVisible())await expand.click();
-    const section=page.getByTestId('recent-review-examples');await section.waitFor();
-    const visibleTitle=page.getByRole('button',{name:'Recolher detalhes de '+name,exact:true}).getByText(name,{exact:true});
-    assert.ok(await visibleTitle.evaluate(element=>{
-     const box=element.getBoundingClientRect();
-     return element.contains(document.elementFromPoint(box.left+box.width/2,box.top+box.height/2));
-    }),'expanded place title must not be covered by the map filters');
-    const text=await section.innerText();
-    assert.ok(text.includes('nomes e comentários fictícios'));
-    for(const row of reviewFixtures.filter(row=>row.lugar_id===id))assert.ok(text.includes(row.nome_exibicao)&&text.includes(row.descricao));
-    const bounds=await section.boundingBox();assert.ok(bounds.x>=0&&bounds.x+bounds.width<=viewport.width+1,'review cards fit a small phone viewport');
-    examplePlaces.push({id,classification:label,reviews:4,explicitLabels:true});
-    if(process.env.QA_TAB_SCREENSHOTS&&id==='nereu')await page.screenshot({path:process.env.QA_TAB_SCREENSHOTS+'/review-examples-'+viewport.width+'.png'});
-   }
-   // Real approved perceptions retain priority over presentation status.
-   approved='Segura';await page.goto(base+'/mapa?placeId=congresso',{waitUntil:'domcontentloaded'});
-   const header=page.getByRole('button',{name:/^(Ver|Recolher) detalhes de Praça do Congresso$/});
-   await header.getByText('Seguro',{exact:true}).waitFor({timeout:60000});
-   assert.equal(await page.getByText('Moderado · apresentação',{exact:true}).count(),0);
-  }else{
-   assert.equal(await page.getByTestId('recent-review-examples').count(),0,'normal app never inserts sample review cards');
-  }
+  assert.equal(await page.getByTestId('recent-review-examples').count(),0,'sample comments do not appear on the map');
   await continueLoading.waitFor({state:'hidden',timeout:15000});
   assert.equal(await page.getByText('exemplo fictício',{exact:false}).count(),0);
   assert.deepEqual(unknown,[],'every backend interaction has an explicit local fixture');
@@ -222,7 +194,7 @@ try {
   await page.getByTestId('welcome-how-it-works').waitFor({timeout:15000});
   assert.equal(await page.getByText('PASSO 1 DE 4',{exact:false}).count(),0,'logout restores the new welcome, not an unsolicited tour');
   assert.deepEqual(unknown,[]);assert.deepEqual(errors,[]);
-  checks.push({viewport,blur:true,stableNavigation:true,rapidTabs:true,reducedMotion:true,profileOptions:profileChecks,requestedTransition,sharedReportButtons:true,reviewSubmission:true,classifications:['Seguro','Moderado','Cuidado'],examplePlaces,realRatingsTakePriority:true,logoutToWelcome:true,runtimeErrors:errors.length});
+  checks.push({viewport,blur:true,stableNavigation:true,rapidTabs:true,reducedMotion:true,profileOptions:profileChecks,requestedTransition,sharedReportButtons:true,reviewSubmission:true,classifications:['Seguro','Moderado','Cuidado'],factorHighlights:true,logoutToWelcome:true,runtimeErrors:errors.length});
   await context.close();
  }
  console.log(JSON.stringify({test:'Expo web UI with isolated API fixtures; no live writes',checks}));

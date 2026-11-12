@@ -1,10 +1,41 @@
-import {
-  communityMoods,
-  communityStatus,
-  type ReviewSummary,
-} from "../constants/community";
+import { communityMoods, communityStatus, type ReviewFactorMention, type ReviewSummary } from "../constants/community";
 import type { Place } from "../constants/places";
 import { requireBackend } from "../lib/supabase";
+
+const attentionLabels: Record<string, string> = {
+  iluminacao: "Iluminação",
+  movimento: "Movimento de pessoas",
+  acessibilidade: "Acessibilidade",
+  limpeza: "Limpeza e conservação",
+  assedio: "Assédio ou importunação",
+};
+const strengthLabels: Record<string, string> = {
+  iluminacao: "Boa iluminação",
+  movimento: attentionLabels.movimento,
+  acessibilidade: attentionLabels.acessibilidade,
+  limpeza: attentionLabels.limpeza,
+};
+
+function parseFactorMentions(
+  values: unknown,
+  labels: Record<string, string>,
+  maxCount: number,
+): ReviewFactorMention[] {
+  if (!Array.isArray(values) || values.length > 3) return [];
+  const mentions: ReviewFactorMention[] = [];
+  const seen = new Set<string>();
+  for (const value of values) {
+    const id = value?.fator, count = value?.total;
+    if (
+      typeof id !== "string" || !Object.hasOwn(labels, id) || seen.has(id) ||
+      !Number.isSafeInteger(count) || count < 1 || count > maxCount
+    ) continue;
+    seen.add(id);
+    mentions.push({ label: labels[id], count });
+  }
+  return mentions.sort((a, b) => b.count - a.count);
+}
+
 export function parseReviewSummaries(
   data: unknown,
   policy?: unknown,
@@ -70,6 +101,12 @@ export function parseReviewSummaries(
       minimum: item.minimo,
       windowDays: item.janela_dias,
       distribution,
+      ...(distribution && item.destaques && {
+        highlights: {
+          strengths: parseFactorMentions(item.destaques.fortes, strengthLabels, distribution.Segura),
+          attention: parseFactorMentions(item.destaques.atencao, attentionLabels, distribution.Moderada + distribution.Cuidado),
+        },
+      }),
       lastContribution:
         typeof item.ultima_contribuicao === "string"
           ? item.ultima_contribuicao
