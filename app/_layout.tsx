@@ -38,7 +38,7 @@ import {
   ThemeProvider,
 } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { CitySkyline } from "../components/CitySkyline";
 import { WebFormStyles } from "../components/WebFormStyles";
@@ -116,7 +116,7 @@ function RootContent() {
                   key={session?.user.id ?? "signed-out"}
                   screenOptions={{
                     headerShown: false,
-                    animation: reduced ? "none" : "fade",
+                    animation: Platform.OS === "web" || reduced ? "none" : "fade",
                     contentStyle: { backgroundColor: "transparent" },
                   }}
                 >

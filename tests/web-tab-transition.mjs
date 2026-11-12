@@ -45,13 +45,15 @@ const go=destination=>act(async()=>gateway(destination,()=>routes.push(destinati
 const complete=async(effect=animations.at(-1))=>act(async()=>effect.complete());
 try {
  await act(async()=>{renderer=TestRenderer.create(tree(),{createNodeMock:element=>element.props.testID==='tab-transition-scene'?scene:{}});});
- assert.equal(style.filter,undefined,'idle scene has no active filter or transform');
+ assert.equal(style.transform,undefined,'idle scene has no transform');
  await go('/eventos');assert.equal(motion.moving,true);assert.deepEqual(routes,[]);
- assert.equal(animations.at(-1).keyframes[0].filter,'none');
- assert.equal(animations.at(-1).keyframes[1].filter,'blur(6px)');
- await complete();await step();assert.deepEqual(routes,[],'outgoing defocus must reach a paint boundary');await step();
+ assert.equal(animations.at(-1).keyframes[0].opacity,'1');
+ assert.equal(animations.at(-1).keyframes[1].opacity,'0.78');
+ assert.ok(animations.at(-1).keyframes.every(frame=>!('filter' in frame)),'a transition must not blur the full viewport');
+ await complete();await step();assert.deepEqual(routes,[],'outgoing frame must reach a paint boundary');await step();
  assert.deepEqual(routes,['/eventos']);path='/eventos';await update();
- assert.equal(style.filter,'blur(6px)','destination starts defocused');
+ assert.equal(style.opacity,'0.78','destination starts with the incoming fade');
+ assert.match(style.transform,/7px/);
  await paint();await complete();
  assert.equal(style.filter,undefined);assert.equal(style.transform,undefined);
  assert.equal(attributes.has('data-elas-motion'),false);assert.equal(motion.moving,false);
@@ -65,7 +67,7 @@ try {
  path='/eventos';await update();await paint();await complete();
  let opened=0,closed=0;
  await act(async()=>motion.openPanel(()=>opened++));await complete();
- assert.equal(opened,1);assert.equal(style.filter,'blur(6px)');assert.equal(motion.moving,true);
+ assert.equal(opened,1);assert.equal(style.opacity,'0.87');assert.equal(motion.moving,true);
  await act(async()=>motion.closePanel(()=>closed++));await paint();await complete();
  assert.equal(closed,1);assert.equal(style.filter,undefined);assert.equal(motion.moving,false);
  await go('/mapa');const interrupted=animations.at(-1);reduced=true;await update();
@@ -73,8 +75,12 @@ try {
  const count=routes.length;await complete(interrupted);await paint();assert.equal(routes.length,count,'reduced motion consumes the pending action once');
  assert.equal(style.filter,undefined);assert.equal(motion.moving,false);
  await go('/alertas');assert.equal(routes.at(-1),'/alertas');assert.equal(motion.moving,false);
+ path='/alertas';await update();await paint();
+ assert.deepEqual(animations.at(-1).keyframes,[{transform:'none',opacity:'0.82'},{transform:'none',opacity:'1'}],
+  'reduced motion retains an opacity cue without moving or delaying the route');
+ await complete();assert.equal(style.opacity,undefined);
  await act(async()=>renderer.unmount());assert.equal(gateway,null);assert.equal(timers.size,0);assert.equal(frames.size,0);
- console.log('Web route motion passed: browser keyframes, painted exit and arrival, idle filter removal, cancellation, sheet and reduced motion.');
+ console.log('Web route motion passed: composited exit/arrival, cleanup, interrupted navigation, sheet and opacity-only reduced motion.');
 }finally{
  console.error=oldConsole;
  delete globalThis.getComputedStyle;delete globalThis.requestAnimationFrame;delete globalThis.cancelAnimationFrame;

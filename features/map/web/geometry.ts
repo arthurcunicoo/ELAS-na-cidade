@@ -1,5 +1,15 @@
 export const TILE = 256;
 export const MERCATOR_LIMIT = 85.0511287798066;
+export type TileWindow = { left: number; top: number; columns: number; rows: number };
+export function tileWindow(left: number, top: number, width: number, height: number): TileWindow {
+  const column = Math.floor(left / TILE), row = Math.floor(top / TILE);
+  return {
+    left: column * TILE,
+    top: row * TILE,
+    columns: width > 0 ? Math.ceil((left + width) / TILE) - column : 0,
+    rows: height > 0 ? Math.ceil((top + height) / TILE) - row : 0,
+  };
+}
 export function project(latitude: number, longitude: number, zoom: number) {
   const size = TILE * 2 ** zoom;
   const sin = Math.sin(

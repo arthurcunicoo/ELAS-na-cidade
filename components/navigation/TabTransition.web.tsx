@@ -5,9 +5,12 @@ import { registerNavigationTransition } from "../../lib/navigation";
 export const mainTabPaths = ["/mapa", "/eventos", "/alertas", "/perfil"] as const;
 const authPaths = new Set(["/", "/login", "/cadastro", "/recuperar-senha"]);
 const animatedRoute = (path: string) => !authPaths.has(path);
-const EXIT_MS = 150, ENTER_MS = 220;
-const focused = { filter: "none", transform: "none", opacity: "1" };
-const defocused = { filter: "blur(6px)", transform: "scale(1.008)", opacity: "0.92" };
+const EXIT_MS = 105, ENTER_MS = 185, REDUCED_ENTER_MS = 135;
+const focused = { transform: "none", opacity: "1" };
+const leaving = { transform: "translate3d(0, -5px, 0) scale(0.995)", opacity: "0.78" };
+const arriving = { transform: "translate3d(0, 7px, 0) scale(0.995)", opacity: "0.78" };
+const reducedArrival = { transform: "none", opacity: "0.82" };
+const panelBackground = { transform: "scale(0.993)", opacity: "0.87" };
 type Frame = typeof focused;
 type Pending = {
   destination: string | null;
@@ -28,6 +31,7 @@ export function TabTransitionProvider({ path, reduced, children }: { path: strin
   const [moving, setMoving] = useState(false);
   const scene = useRef<HTMLElement | null>(null);
   const route = useRef(path), previous = useRef(path), generation = useRef(0);
+  const previousReduced = useRef(reduced);
   const pending = useRef<Pending | null>(null);
   const visual = useRef<Frame>(focused);
   const animation = useRef<Animation | null>(null);
@@ -48,12 +52,10 @@ export function TabTransitionProvider({ path, reduced, children }: { path: strin
     const node = scene.current;
     if (!node) return;
     if (next === focused && settled) {
-      node.style.removeProperty("filter");
       node.style.removeProperty("transform");
       node.style.removeProperty("opacity");
       node.removeAttribute("data-elas-motion");
     } else {
-      node.style.filter = next.filter;
       node.style.transform = next.transform;
       node.style.opacity = next.opacity;
       node.setAttribute("data-elas-motion", "active");
@@ -64,7 +66,7 @@ export function TabTransitionProvider({ path, reduced, children }: { path: strin
     if (preserve && animation.current && scene.current) {
       // Only interrupted transitions need a computed-style read.
       const style = getComputedStyle(scene.current);
-      apply({ filter: style.filter, transform: style.transform, opacity: style.opacity });
+      apply({ transform: style.transform, opacity: style.opacity });
     }
     animation.current?.cancel();
     animation.current = null;
@@ -106,16 +108,17 @@ export function TabTransitionProvider({ path, reduced, children }: { path: strin
       apply(to);
       next();
     };
-    apply(to, false);
+    apply(from, false);
     if (!node || typeof node.animate !== "function") {
       finish();
       return;
     }
-    // The browser owns interpolation. No JavaScript style write on every frame.
+    // Keep the transition on composited properties, including over the live map.
     try {
       const effect = node.animate([from, to], {
         duration,
         easing: to === focused ? "cubic-bezier(.18,.72,.28,1)" : "ease-in-out",
+        fill: "both",
       });
       animation.current = effect;
       void effect.finished.then(finish, () => {});
@@ -124,11 +127,12 @@ export function TabTransitionProvider({ path, reduced, children }: { path: strin
       finish();
     }
   }, [apply]);
-  const focus = useCallback(() => {
-    stop();
+  const focus = useCallback((entry?: Frame) => {
+    stop(entry === undefined);
     pending.current = null;
-    afterPaint(() => play(focused, ENTER_MS, () => setMoving(false)));
-  }, [afterPaint, play, stop]);
+    if (entry) apply(entry);
+    afterPaint(() => play(focused, reduced ? REDUCED_ENTER_MS : ENTER_MS, () => setMoving(false)));
+  }, [afterPaint, apply, play, reduced, stop]);
   const navigate = useCallback((destination: string | null, dispatch: () => void) => {
     if (destination && pending.current?.destination === destination) return;
     if (destination && !pending.current && route.current === destination) {
@@ -145,7 +149,7 @@ export function TabTransitionProvider({ path, reduced, children }: { path: strin
     }
     pending.current = { destination, source: route.current, dispatch, dispatched: false };
     setMoving(true);
-    play(defocused, EXIT_MS, () => afterPaint(() => {
+    play(leaving, EXIT_MS, () => afterPaint(() => {
       const request = pending.current;
       if (!request) return;
       request.dispatched = true;
@@ -163,7 +167,7 @@ export function TabTransitionProvider({ path, reduced, children }: { path: strin
     open();
     setMoving(!reduced);
     if (reduced) apply(focused);
-    else play(defocused, EXIT_MS, () => {});
+    else play(panelBackground, EXIT_MS, () => {});
   }, [apply, play, reduced, stop]);
   const closePanel = useCallback((close: () => void) => {
     close();
@@ -177,23 +181,23 @@ export function TabTransitionProvider({ path, reduced, children }: { path: strin
   useLayoutEffect(() => {
     const from = previous.current;
     previous.current = path;
+    const preferenceChanged = previousReduced.current !== reduced;
+    previousReduced.current = reduced;
     const request = pending.current;
-    if (reduced || !animatedRoute(path)) {
+    if (preferenceChanged || !animatedRoute(path)) {
       stop(false);
       pending.current = null;
       apply(focused);
       setMoving(false);
-      if (reduced && request && !request.dispatched) request.dispatch();
+      if (preferenceChanged && request && !request.dispatched) request.dispatch();
     } else if (request?.dispatched && (
       request.destination === path || (!request.destination && request.source !== path)
     )) {
-      focus();
+      focus(arriving);
     } else if (!request && from !== path && animatedRoute(from)) {
       // Browser Back and route changes outside the navigation helper still animate.
-      stop(false);
-      apply(defocused);
-      setMoving(true);
-      focus();
+      setMoving(!reduced);
+      focus(reduced ? reducedArrival : arriving);
     }
   }, [path, reduced, apply, focus, stop]);
   useLayoutEffect(() => registerNavigationTransition(navigate), [navigate]);

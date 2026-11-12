@@ -1,54 +1,44 @@
 import { useEffect, useMemo, useRef } from "react";
 import { PanResponder } from "react-native";
 import { createFrameScheduler } from "../frameScheduler";
-import { unproject } from "./geometry";
-export function useWebMapDrag(
-  center: { x: number; y: number },
-  zoom: number,
-  onClear: () => void,
-  setViewport: (coordinate: { latitude: number; longitude: number }) => void,
-  setDragging: (dragging: boolean) => void,
-) {
-  const dragStart = useRef(center);
-  const gestureState = useRef({ center, zoom, onClear });
-  gestureState.current = { center, zoom, onClear };
+export type DragOffset = { x: number; y: number };
+type DragActions = {
+  start: () => void;
+  move: (offset: DragOffset) => void;
+  end: (offset: DragOffset) => void;
+};
+export function useWebMapDrag(actions: DragActions) {
+  const latest = useRef(actions);
+  latest.current = actions;
+  const offset = useRef<DragOffset>({ x: 0, y: 0 });
   const frames = useMemo(
     () =>
-      createFrameScheduler(
-        setViewport,
+      createFrameScheduler<DragOffset>(
+        (next) => latest.current.move(next),
         requestAnimationFrame,
         cancelAnimationFrame,
       ),
-    [setViewport],
+    [],
   );
   useEffect(() => () => frames.cancel(), [frames]);
-  return useMemo(
-    () =>
-      PanResponder.create({
-        onMoveShouldSetPanResponder: (_, gesture) =>
-          Math.hypot(gesture.dx, gesture.dy) > 6,
-        onPanResponderGrant: () => {
-          dragStart.current = gestureState.current.center;
-          setDragging(true);
-          gestureState.current.onClear();
-        },
-        onPanResponderMove: (_, gesture) =>
-          frames.schedule(
-            unproject(
-              dragStart.current.x - gesture.dx,
-              dragStart.current.y - gesture.dy,
-              gestureState.current.zoom,
-            ),
-          ),
-        onPanResponderRelease: () => {
-          frames.flush();
-          setDragging(false);
-        },
-        onPanResponderTerminate: () => {
-          frames.flush();
-          setDragging(false);
-        },
-      }),
-    [frames, setDragging],
-  );
+  return useMemo(() => {
+    const finish = () => {
+      frames.cancel();
+      latest.current.end(offset.current);
+    };
+    return PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gesture) =>
+        Math.hypot(gesture.dx, gesture.dy) > 6,
+      onPanResponderGrant: () => {
+        offset.current = { x: 0, y: 0 };
+        latest.current.start();
+      },
+      onPanResponderMove: (_, gesture) => {
+        offset.current = { x: gesture.dx, y: gesture.dy };
+        frames.schedule(offset.current);
+      },
+      onPanResponderRelease: finish,
+      onPanResponderTerminate: finish,
+    });
+  }, [frames]);
 }

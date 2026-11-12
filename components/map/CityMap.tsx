@@ -1,4 +1,4 @@
-import { project, unproject } from "../../features/map/web/geometry";
+import { project, tileWindow, unproject, type TileWindow } from "../../features/map/web/geometry";
 import { webTileProvider } from "../../features/map/web/tileProvider";
 import { WebMapTiles } from "./web/WebMapTiles";
 import { WebMapControls } from "./web/WebMapControls";
@@ -8,8 +8,8 @@ import { ReportMarker } from "./ReportMarker";
 import { nodesWithSelection, reportClusterRegion, reportNodeLabel } from "../../features/map/reportClusters";
 import { palette, mapCanvas, typography } from "../../constants/theme";
 import { visibleMapPlaces } from "../../constants/placeRelevance";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Pressable, StyleSheet, Text, View, type ViewInstance } from "react-native";
 import { CityMapProps } from "./CityMap.types";
 import { groupMapPoints, type MapPoint } from "../../constants/placeCategories";
 import { MapAttribution } from "./MapAttribution";
@@ -64,10 +64,18 @@ function CityMap({
     ),
   );
   const [dragging, setDragging] = useState(false);
+  const [dragWindow, setDragWindow] = useState<TileWindow | null>(null);
+  const dragTiles = useRef<TileWindow | null>(null);
+  const layer = useRef<ViewInstance | null>(null);
   const lastSelected = useRef<string | null>(null);
   const center = project(viewport.latitude, viewport.longitude, zoom);
   const left = Math.round(center.x - size.width / 2),
     top = Math.round(center.y - size.height / 2);
+  useLayoutEffect(() => {
+    if (dragging) return;
+    const style = (layer.current as unknown as HTMLElement | null)?.style;
+    style?.removeProperty("transform");
+  }, [dragging, left, top]);
   useEffect(() => {
     if (!selected) {
       lastSelected.current = null;
@@ -197,7 +205,38 @@ function CityMap({
     },
     [onSelect, onSelectGroup, onClear, zoom, maxZoom],
   );
-  const drag = useWebMapDrag(center, zoom, onClear, setViewport, setDragging);
+  const drag = useWebMapDrag({
+    start() {
+      dragTiles.current = tileWindow(left, top, size.width, size.height);
+      const style = (layer.current as unknown as HTMLElement | null)?.style;
+      style?.setProperty("will-change", "transform");
+      setDragging(true);
+      onClear();
+    },
+    move({ x, y }) {
+      const current = dragTiles.current;
+      if (!current) return;
+      const style = (layer.current as unknown as HTMLElement | null)?.style;
+      style?.setProperty("transform", `translate3d(${x}px, ${y}px, 0)`);
+      const next = tileWindow(left - x, top - y, size.width, size.height);
+      if (
+        current.left === next.left && current.top === next.top &&
+        current.columns === next.columns && current.rows === next.rows
+      ) return;
+      // React only replaces tiles when the visible grid changes.
+      dragTiles.current = next;
+      setDragWindow(next);
+    },
+    end({ x, y }) {
+      if (!dragTiles.current) return;
+      dragTiles.current = null;
+      const style = (layer.current as unknown as HTMLElement | null)?.style;
+      style?.removeProperty("will-change");
+      moveViewport(unproject(center.x - x, center.y - y, zoom));
+      setDragWindow(null);
+      setDragging(false);
+    },
+  });
   return (
     <View
       {...drag.panHandlers}
@@ -216,6 +255,7 @@ function CityMap({
         style={StyleSheet.absoluteFill}
       />
       <View
+        ref={layer}
         pointerEvents="box-none"
         style={StyleSheet.absoluteFill}
         accessibilityLabel={`Mapa de ${areaName}`}
@@ -225,6 +265,7 @@ function CityMap({
           top={top}
           width={size.width}
           height={size.height}
+          dragWindow={dragWindow}
           zoom={zoom}
           provider={webTileProvider}
           onLoadStateChange={onLoadStateChange}

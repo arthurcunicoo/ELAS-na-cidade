@@ -1,12 +1,13 @@
 import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { Image, StyleSheet, View } from "react-native";
-import { TILE, visibleTiles } from "../../../features/map/web/geometry";
+import { TILE, tileWindow, visibleTiles, type TileWindow } from "../../../features/map/web/geometry";
 import { tileUrl, type TileProvider } from "../../../features/map/web/tileProvider";
 type Props = {
   left: number;
   top: number;
   width: number;
   height: number;
+  dragWindow?: TileWindow | null;
   zoom: number;
   provider: TileProvider | null;
   onLoadStateChange?: (state: "ready" | "error") => void;
@@ -20,19 +21,14 @@ const TileLayer = memo(function TileLayer({
   top,
   width,
   height,
+  dragWindow,
   zoom,
   provider,
   onLoadStateChange,
   onFailure,
 }: Props) {
-  const tileLeft = Math.floor(left / TILE) * TILE,
-    tileTop = Math.floor(top / TILE) * TILE;
-  const columns = width
-    ? Math.floor((left + width - 1) / TILE) - tileLeft / TILE + 1
-    : 0;
-  const rows = height
-    ? Math.floor((top + height - 1) / TILE) - tileTop / TILE + 1
-    : 0;
+  const { left: tileLeft, top: tileTop, columns, rows } =
+    dragWindow ?? tileWindow(left, top, width, height);
   const tiles = useMemo(
     () => visibleTiles(tileLeft, tileTop, columns * TILE, rows * TILE, zoom),
     [tileLeft, tileTop, columns, rows, zoom],

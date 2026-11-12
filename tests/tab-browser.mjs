@@ -96,22 +96,22 @@ try {
     window.__elasMotion=[];window.__elasMotionActive=true;
     const sample=()=>{
      const scene=document.querySelector('[data-testid="tab-transition-scene"]'),nav=document.querySelector('[data-testid="nav-map"]');
-     const filter=scene?getComputedStyle(scene).filter:'none';
-     window.__elasMotion.push({path:location.pathname,blur:Number(filter.match(/blur\(([-\d.]+)px\)/)?.[1]??0),navFilter:nav?getComputedStyle(nav).filter:'none',browserTimeline:scene?.getAnimations().length??0});
+     const style=scene?getComputedStyle(scene):null;
+     window.__elasMotion.push({path:location.pathname,opacity:Number(style?.opacity??1),filter:style?.filter??'none',navFilter:nav?getComputedStyle(nav).filter:'none',browserTimeline:scene?.getAnimations().length??0});
      if(window.__elasMotionActive)requestAnimationFrame(sample);
     };requestAnimationFrame(sample);
    });
    await locator.click();await page.waitForURL('**/'+destination);await idle();
-   await page.waitForFunction(()=>{const filter=getComputedStyle(document.querySelector('[data-testid="tab-transition-scene"]')).filter;return Number(filter.match(/blur\(([-\d.]+)px\)/)?.[1]??0)<0.2;});
+   await page.waitForFunction(()=>{const style=getComputedStyle(document.querySelector('[data-testid="tab-transition-scene"]'));return style.opacity==='1'&&style.transform==='none';});
    await page.waitForTimeout(40);
    const samples=await page.evaluate(()=>{window.__elasMotionActive=false;return window.__elasMotion;});
-   assert.ok(samples.some(row=>row.path===from&&row.blur>3),'outgoing screen must visibly defocus before navigation');
-   assert.ok(samples.some(row=>row.path==='/'+destination&&row.blur>3),'destination must initially arrive blurred');
-   assert.ok(samples.at(-1).blur<0.2,'the destination returns to full focus');
+   assert.ok(samples.some(row=>row.path===from&&row.opacity<0.92),'outgoing screen must visibly fade before navigation');
+   assert.ok(samples.some(row=>row.path==='/'+destination&&row.opacity<0.92),'destination must visibly fade in');
+   assert.equal(samples.at(-1).opacity,1,'the destination returns to full opacity');
    assert.ok(samples.every(row=>row.navFilter==='none'),'navigation stays sharp');
+   assert.ok(samples.every(row=>row.filter==='none'),'the transition never filters the whole scene');
    assert.ok(samples.some(row=>row.browserTimeline>0),'the browser owns the animated frames');
-   assert.equal(await page.getByTestId('tab-transition-scene').evaluate(element=>getComputedStyle(element).filter),'none','no filter stays applied after the transition');
-   return {from,to:'/'+destination,maxBlur:Math.max(...samples.map(row=>row.blur))};
+   return {from,to:'/'+destination,minOpacity:Math.min(...samples.map(row=>row.opacity))};
   };
   const before=await page.getByTestId('nav-events').boundingBox();
   await trace(page.getByTestId('nav-events'),'eventos');
@@ -130,7 +130,7 @@ try {
   await trace(page.getByTestId('nav-profile'),'perfil');
   await page.getByRole('button',{name:'Participar: avaliar um lugar ou relatar uma situação',exact:true}).click();
   await page.getByRole('button',{name:'Avaliar um lugar',exact:true}).waitFor();
-  await page.waitForFunction(()=>Number(getComputedStyle(document.querySelector('[data-testid="tab-transition-scene"]')).filter.match(/blur\(([-\d.]+)px\)/)?.[1]??0)>=5);
+  await page.waitForFunction(()=>Number(getComputedStyle(document.querySelector('[data-testid="tab-transition-scene"]')).opacity)<0.9);
   await page.getByRole('button',{name:'Fechar Como você quer participar?',exact:true}).click();await idle();
   const profileChecks=[];
   for(const [label,destination] of [['Informações pessoais','informacoes-pessoais'],['Configurações','configuracoes'],['Minhas avaliações','minhas-avaliacoes'],['Meus favoritos','favoritos'],['Meus relatos','meus-relatos'],['Minhas solicitações','minhas-solicitacoes'],['Notificações','notificacoes'],['Ver todas as conquistas','conquistas'],['Alterar foto do perfil','foto-perfil']]){
@@ -141,8 +141,8 @@ try {
   await page.getByTestId('nav-events').dispatchEvent('click');await page.getByTestId('nav-reports').dispatchEvent('click');
   await page.waitForURL('**/alertas');await idle();
   await page.emulateMedia({reducedMotion:'reduce'});await page.getByTestId('nav-events').click();await page.waitForURL('**/eventos');await idle();
-  const reducedFilter=await page.getByTestId('tab-transition-scene').evaluate(element=>getComputedStyle(element).filter);
-  assert.ok(reducedFilter==='none'||reducedFilter==='blur(0px)');
+  const reducedTransform=await page.getByTestId('tab-transition-scene').evaluate(element=>getComputedStyle(element).transform);
+  assert.equal(reducedTransform,'none','reduced motion fades without moving the scene');
 
   // Selected place classification is hydrated through the real services/parser.
   await page.goto(base+'/mapa?placeId='+placeId,{waitUntil:'domcontentloaded'});
@@ -194,7 +194,7 @@ try {
   await page.getByTestId('welcome-how-it-works').waitFor({timeout:15000});
   assert.equal(await page.getByText('PASSO 1 DE 4',{exact:false}).count(),0,'logout restores the new welcome, not an unsolicited tour');
   assert.deepEqual(unknown,[]);assert.deepEqual(errors,[]);
-  checks.push({viewport,blur:true,stableNavigation:true,rapidTabs:true,reducedMotion:true,profileOptions:profileChecks,requestedTransition,sharedReportButtons:true,reviewSubmission:true,classifications:['Seguro','Moderado','Cuidado'],factorHighlights:true,logoutToWelcome:true,runtimeErrors:errors.length});
+  checks.push({viewport,sceneTransition:true,stableNavigation:true,rapidTabs:true,reducedMotion:true,profileOptions:profileChecks,requestedTransition,sharedReportButtons:true,reviewSubmission:true,classifications:['Seguro','Moderado','Cuidado'],factorHighlights:true,logoutToWelcome:true,runtimeErrors:errors.length});
   await context.close();
  }
  console.log(JSON.stringify({test:'Expo web UI with isolated API fixtures; no live writes',checks}));

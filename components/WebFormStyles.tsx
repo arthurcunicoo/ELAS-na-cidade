@@ -82,7 +82,7 @@ export const WebFormStyles = memo(function WebFormStyles() {
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
     }
-    /* The scene is already defocused during the swoosh. Skip extra blur passes. */
+    /* Skip backdrop filters while the scene is compositing a transition. */
     [data-elas-motion="active"] div[style*="rgba("] {
       backdrop-filter: none !important;
       -webkit-backdrop-filter: none !important;

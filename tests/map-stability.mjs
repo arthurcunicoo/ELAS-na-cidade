@@ -95,7 +95,14 @@ const useCatalogRegion = load('../features/map/useCatalogRegion.ts').useCatalogR
 const CityMap = load('../components/map/CityMap.tsx').default;
 const Screen = load('../features/map/MapScreen.tsx', { './useCatalogRegion': { useCatalogRegion }, '../../components/map/CityMap': { default: CityMap } }).default;
 let renderer;
-await act(async () => { renderer = TestRenderer.create(React.createElement(Screen)); });
+const mapLayerStyles = new Map();
+await act(async () => {
+  renderer = TestRenderer.create(React.createElement(Screen), {
+    createNodeMock: element => element.props.accessibilityLabel === 'Mapa de Criciúma'
+      ? { style: { setProperty: (key,value) => mapLayerStyles.set(key,value), removeProperty: key => mapLayerStyles.delete(key) } }
+      : null,
+  });
+});
 assert.equal(renderer.root.findByType('MapLoadingPopup').props.visible,true);
 screenFocused=false;await act(async()=>renderer.update(React.createElement(Screen)));
 assert.equal(renderer.root.findByType('MapLoadingPopup').props.visible,false,'map loading cannot cover another tab through its modal portal');
@@ -149,6 +156,26 @@ assert.equal(requests, settledRequests + 1, 'a real pan must still fetch its are
 const parks = renderer.root.findAll(n => n.type === 'TouchFeedback' && n.props.label === 'Filtrar Parques')[0];
 await act(async () => parks.props.onPress()); await advanceRequests();
 assert.ok(!text(renderer.root).includes('nesta área'), 'the redundant category counter should stay removed');
+const dragHandlers = () => renderer.root.findAll(node => node.type === 'View' && node.props.onPanResponderGrant)[0].props;
+const tileSources = () => renderer.root.findAllByType('Image').map(node => node.props.source?.uri);
+const oldTiles = tileSources(), oldRegion = renderer.root.findByType(CityMap.type).props.region, beforeDrag = requests;
+await act(async () => dragHandlers().onPanResponderGrant());
+await act(async () => {
+  dragHandlers().onPanResponderMove(null,{ dx: 320, dy: 0 });
+  for (const [id, timer] of [...timers]) if (timer.ms === 16) { timers.delete(id); timer.fn(); }
+});
+assert.equal(mapLayerStyles.get('transform'),'translate3d(320px, 0px, 0)');
+assert.notDeepEqual(tileSources(),oldTiles,'crossing a tile boundary must keep the newly visible tiles covered');
+assert.equal(renderer.root.findByType(CityMap.type).props.region,oldRegion,'drag frames do not publish regions');
+assert.equal(requests,beforeDrag);
+await act(async () => {
+  dragHandlers().onPanResponderMove(null,{ dx: 410, dy: 0 });
+  dragHandlers().onPanResponderRelease();
+});
+assert.equal(mapLayerStyles.size,0,'release removes the temporary transform after committing the viewport');
+const newRegion = renderer.root.findByType(CityMap.type).props.region;
+assert.ok(Math.abs(newRegion.longitude - (oldRegion.longitude - oldRegion.longitudeDelta*410/390)) < 1e-8,
+  'release commits the last pointer position even before its next paint');
 await act(async () => renderer.unmount());
 console.error = originalError;
-console.log(`Mounted map regression passed: selection settles after ${settledRequests} requests, 20 load/layout cycles stay stable, background indicator absent, real pan and category changes still work.`);
+console.log(`Mounted map regression passed: selection settles after ${settledRequests} requests, layout stays stable, and drag moves the layer, refreshes visible tiles and commits the last position once.`);
