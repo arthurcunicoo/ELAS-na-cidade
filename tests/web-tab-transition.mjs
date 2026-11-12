@@ -9,20 +9,25 @@ globalThis.IS_REACT_ACT_ENVIRONMENT=true;
 const require=createRequire(import.meta.url);
 const oldConsole=console.error;
 console.error=(...args)=>{if(!String(args[0]).includes('react-test-renderer is deprecated'))oldConsole(...args);};
-let nextId=0, renderer, motion, path='/mapa', reduced=false, gateway;
-const timers=new Map(), frames=new Map(), animations=[], routes=[];
+let nextId=0, renderer, motion, path='/mapa', reduced=false, gateway, active;
+const timers=new Map(), frames=new Map(), transitions=[], routes=[];
 const attributes=new Map();
 const style={removeProperty(name){delete this[name];}};
 const scene={
  style,setAttribute:(name,value)=>attributes.set(name,value),removeAttribute:name=>attributes.delete(name),
- animate(keyframes,options){
-  let resolve,reject;
-  const finished=new Promise((yes,no)=>{resolve=yes;reject=no;});
-  const effect={finished,keyframes,options,complete:resolve,cancelled:false,cancel(){this.cancelled=true;reject(new Error('cancelled'));}};
-  animations.push(effect);return effect;
+ addEventListener(name,end){
+  assert.equal(name,'transitionend');
+  active={end,from:{transform:style.transform,opacity:style.opacity},detached:false};
+  transitions.push(active);
+ },
+ removeEventListener(name,end){
+  assert.equal(name,'transitionend');
+  assert.equal(active.end,end);
+  active.detached=true;
+  active=null;
  },
 };
-globalThis.getComputedStyle=()=>({filter:style.filter??'none',transform:style.transform??'none',opacity:style.opacity??'1'});
+globalThis.getComputedStyle=()=>active?.from??{transform:style.transform??'none',opacity:style.opacity??'1'};
 globalThis.requestAnimationFrame=fn=>{const id=++nextId;frames.set(id,fn);return id;};
 globalThis.cancelAnimationFrame=id=>frames.delete(id);
 const native={View:'View',StyleSheet:{create:value=>value}};
@@ -42,43 +47,47 @@ const update=()=>act(async()=>renderer.update(tree()));
 const step=async()=>act(async()=>{const current=[...frames.values()];frames.clear();current.forEach(fn=>fn());});
 const paint=async()=>{await step();await step();};
 const go=destination=>act(async()=>gateway(destination,()=>routes.push(destination)));
-const complete=async(effect=animations.at(-1))=>act(async()=>effect.complete());
+const complete=async(transition=transitions.at(-1),target=scene)=>act(async()=>transition.end({target,propertyName:'opacity'}));
 try {
  await act(async()=>{renderer=TestRenderer.create(tree(),{createNodeMock:element=>element.props.testID==='tab-transition-scene'?scene:{}});});
  assert.equal(style.transform,undefined,'idle scene has no transform');
  await go('/eventos');assert.equal(motion.moving,true);assert.deepEqual(routes,[]);
- assert.equal(animations.at(-1).keyframes[0].opacity,'1');
- assert.equal(animations.at(-1).keyframes[1].opacity,'0.78');
- assert.ok(animations.at(-1).keyframes.every(frame=>!('filter' in frame)),'a transition must not blur the full viewport');
+ assert.equal(transitions.at(-1).from.opacity,'1');
+ assert.equal(style.opacity,'0.64');
+ assert.match(style.transition,/opacity 145ms.*transform 145ms/);
+ assert.ok(!style.transition.includes('filter'),'a transition must not blur the full viewport');
+ await complete(undefined,{});assert.equal(motion.moving,true,'nested transitions cannot complete navigation');
  await complete();await step();assert.deepEqual(routes,[],'outgoing frame must reach a paint boundary');await step();
  assert.deepEqual(routes,['/eventos']);path='/eventos';await update();
- assert.equal(style.opacity,'0.78','destination starts with the incoming fade');
- assert.match(style.transform,/7px/);
+ assert.equal(style.opacity,'0.60','destination starts with the incoming fade');
+ assert.match(style.transform,/20px/);
  await paint();await complete();
- assert.equal(style.filter,undefined);assert.equal(style.transform,undefined);
+ assert.equal(style.transition,undefined);assert.equal(style.transform,undefined);
  assert.equal(attributes.has('data-elas-motion'),false);assert.equal(motion.moving,false);
- await go('/alertas');const cancelled=animations.at(-1);await go('/perfil');
- assert.equal(cancelled.cancelled,true);await complete(cancelled);await paint();assert.deepEqual(routes,['/eventos']);
+ await go('/alertas');const cancelled=transitions.at(-1);await go('/perfil');
+ assert.equal(cancelled.detached,true);await complete(cancelled);await paint();assert.deepEqual(routes,['/eventos']);
  await complete();await paint();assert.deepEqual(routes,['/eventos','/perfil']);path='/perfil';await update();await paint();await complete();
  await go('/alertas');await complete();await paint();assert.equal(routes.at(-1),'/alertas');
- await go('/eventos');const latest=animations.at(-1);
- path='/alertas';await update();assert.equal(latest.cancelled,false,'a late route commit does not erase the newer tap');
- await complete(latest);await paint();assert.equal(routes.at(-1),'/eventos');
+ await go('/eventos');path='/alertas';await update();
+ assert.equal(motion.moving,true,'a late route commit does not erase the newer tap');
+ await paint();assert.equal(routes.at(-1),'/eventos');
  path='/eventos';await update();await paint();await complete();
  let opened=0,closed=0;
  await act(async()=>motion.openPanel(()=>opened++));await complete();
  assert.equal(opened,1);assert.equal(style.opacity,'0.87');assert.equal(motion.moving,true);
  await act(async()=>motion.closePanel(()=>closed++));await paint();await complete();
- assert.equal(closed,1);assert.equal(style.filter,undefined);assert.equal(motion.moving,false);
- await go('/mapa');const interrupted=animations.at(-1);reduced=true;await update();
- assert.equal(interrupted.cancelled,true);assert.equal(routes.at(-1),'/mapa');
+ assert.equal(closed,1);assert.equal(style.transition,undefined);assert.equal(motion.moving,false);
+ await go('/mapa');const interrupted=transitions.at(-1);reduced=true;await update();
+ assert.equal(interrupted.detached,true);assert.equal(routes.at(-1),'/mapa');
  const count=routes.length;await complete(interrupted);await paint();assert.equal(routes.length,count,'reduced motion consumes the pending action once');
- assert.equal(style.filter,undefined);assert.equal(motion.moving,false);
+ assert.equal(style.transition,undefined);assert.equal(motion.moving,false);
  await go('/alertas');assert.equal(routes.at(-1),'/alertas');assert.equal(motion.moving,false);
  path='/alertas';await update();await paint();
- assert.deepEqual(animations.at(-1).keyframes,[{transform:'none',opacity:'0.82'},{transform:'none',opacity:'1'}],
-  'reduced motion retains an opacity cue without moving or delaying the route');
+ assert.deepEqual(transitions.at(-1).from,{transform:'none',opacity:'0.60'});
+ assert.equal(style.transform,'none','reduced motion retains a visible fade without moving the route');
+ assert.equal(style.opacity,'1');
  await complete();assert.equal(style.opacity,undefined);
+ assert.equal(style.transition,undefined);
  await act(async()=>renderer.unmount());assert.equal(gateway,null);assert.equal(timers.size,0);assert.equal(frames.size,0);
  console.log('Web route motion passed: composited exit/arrival, cleanup, interrupted navigation, sheet and opacity-only reduced motion.');
 }finally{

@@ -5,11 +5,11 @@ import { registerNavigationTransition } from "../../lib/navigation";
 export const mainTabPaths = ["/mapa", "/eventos", "/alertas", "/perfil"] as const;
 const authPaths = new Set(["/", "/login", "/cadastro", "/recuperar-senha"]);
 const animatedRoute = (path: string) => !authPaths.has(path);
-const EXIT_MS = 105, ENTER_MS = 185, REDUCED_ENTER_MS = 135;
+const EXIT_MS = 145, ENTER_MS = 280, REDUCED_ENTER_MS = 220;
 const focused = { transform: "none", opacity: "1" };
-const leaving = { transform: "translate3d(0, -5px, 0) scale(0.995)", opacity: "0.78" };
-const arriving = { transform: "translate3d(0, 7px, 0) scale(0.995)", opacity: "0.78" };
-const reducedArrival = { transform: "none", opacity: "0.82" };
+const leaving = { transform: "translate3d(0, -10px, 0)", opacity: "0.64" };
+const arriving = { transform: "translate3d(0, 20px, 0)", opacity: "0.60" };
+const reducedArrival = { transform: "none", opacity: "0.60" };
 const panelBackground = { transform: "scale(0.993)", opacity: "0.87" };
 type Frame = typeof focused;
 type Pending = {
@@ -34,7 +34,7 @@ export function TabTransitionProvider({ path, reduced, children }: { path: strin
   const previousReduced = useRef(reduced);
   const pending = useRef<Pending | null>(null);
   const visual = useRef<Frame>(focused);
-  const animation = useRef<Animation | null>(null);
+  const clearTransition = useRef<(() => void) | null>(null);
   const frame = useRef<number | null>(null);
   const timers = useRef<{
     finish?: ReturnType<typeof setTimeout>;
@@ -63,13 +63,14 @@ export function TabTransitionProvider({ path, reduced, children }: { path: strin
   }, []);
   const stop = useCallback((preserve = true) => {
     ++generation.current;
-    if (preserve && animation.current && scene.current) {
-      // Only interrupted transitions need a computed-style read.
+    let current: Frame | undefined;
+    if (preserve && clearTransition.current && scene.current) {
       const style = getComputedStyle(scene.current);
-      apply({ transform: style.transform, opacity: style.opacity });
+      current = { transform: style.transform, opacity: style.opacity };
     }
-    animation.current?.cancel();
-    animation.current = null;
+    clearTransition.current?.();
+    clearTransition.current = null;
+    if (current) apply(current);
     if (frame.current !== null) cancelAnimationFrame(frame.current);
     frame.current = null;
     for (const timer of Object.values(timers.current)) clearTimeout(timer);
@@ -96,6 +97,11 @@ export function TabTransitionProvider({ path, reduced, children }: { path: strin
   }, []);
   const play = useCallback((to: Frame, duration: number, next: () => void) => {
     const node = scene.current, from = visual.current;
+    if (!node || (from.opacity === to.opacity && from.transform === to.transform)) {
+      apply(to);
+      next();
+      return;
+    }
     const ticket = generation.current;
     let done = false;
     const finish = () => {
@@ -103,29 +109,28 @@ export function TabTransitionProvider({ path, reduced, children }: { path: strin
       done = true;
       clearTimeout(timers.current.finish);
       delete timers.current.finish;
-      animation.current?.cancel();
-      animation.current = null;
+      clearTransition.current?.();
+      clearTransition.current = null;
       apply(to);
       next();
     };
+    const property = from.opacity === to.opacity ? "transform" : "opacity";
+    const onEnd = (event: TransitionEvent) => {
+      if (event.target === node && event.propertyName === property) finish();
+    };
+    clearTransition.current = () => {
+      node.removeEventListener("transitionend", onEnd);
+      node.style.removeProperty("transition");
+    };
     apply(from, false);
-    if (!node || typeof node.animate !== "function") {
-      finish();
-      return;
-    }
-    // Keep the transition on composited properties, including over the live map.
-    try {
-      const effect = node.animate([from, to], {
-        duration,
-        easing: to === focused ? "cubic-bezier(.18,.72,.28,1)" : "ease-in-out",
-        fill: "both",
-      });
-      animation.current = effect;
-      void effect.finished.then(finish, () => {});
-      timers.current.finish = setTimeout(finish, duration + 120);
-    } catch {
-      finish();
-    }
+    // Resolve the starting style before assigning the target, even on a new route.
+    void getComputedStyle(node).opacity;
+    const timing = `${duration}ms ${to === focused ? "cubic-bezier(.25,.15,.3,1)" : "ease-in-out"}`;
+    node.addEventListener("transitionend", onEnd);
+    node.style.transition = `opacity ${timing}, transform ${timing}`;
+    apply(to, false);
+    // Hidden or detached scenes may skip transitionend.
+    timers.current.finish = setTimeout(finish, duration + 300);
   }, [apply]);
   const focus = useCallback((entry?: Frame) => {
     stop(entry === undefined);

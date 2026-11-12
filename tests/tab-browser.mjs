@@ -89,7 +89,7 @@ try {
   await continueIfLoading();
 
   const idle=async()=>page.waitForFunction(()=>document.querySelector('[data-testid="tab-transition-viewport"]')?.getAttribute('aria-busy')!=='true');
-  const trace=async(locator,destination)=>{
+  const trace=async(locator,destination,{reduced=false}={})=>{
    await idle();
    const from=new URL(page.url()).pathname;
    await page.evaluate(()=>{
@@ -97,20 +97,22 @@ try {
     const sample=()=>{
      const scene=document.querySelector('[data-testid="tab-transition-scene"]'),nav=document.querySelector('[data-testid="nav-map"]');
      const style=scene?getComputedStyle(scene):null;
-     window.__elasMotion.push({path:location.pathname,opacity:Number(style?.opacity??1),filter:style?.filter??'none',navFilter:nav?getComputedStyle(nav).filter:'none',browserTimeline:scene?.getAnimations().length??0});
+     window.__elasMotion.push({path:location.pathname,opacity:Number(style?.opacity??1),transform:style?.transform??'none',filter:style?.filter??'none',navFilter:nav?getComputedStyle(nav).filter:'none',browserTimeline:scene?.getAnimations().length??0});
      if(window.__elasMotionActive)requestAnimationFrame(sample);
     };requestAnimationFrame(sample);
    });
    await locator.click();await page.waitForURL('**/'+destination);await idle();
-   await page.waitForFunction(()=>{const style=getComputedStyle(document.querySelector('[data-testid="tab-transition-scene"]'));return style.opacity==='1'&&style.transform==='none';});
+   await page.waitForFunction(()=>!document.querySelector('[data-testid="tab-transition-scene"]')?.hasAttribute('data-elas-motion'));
    await page.waitForTimeout(40);
    const samples=await page.evaluate(()=>{window.__elasMotionActive=false;return window.__elasMotion;});
-   assert.ok(samples.some(row=>row.path===from&&row.opacity<0.92),'outgoing screen must visibly fade before navigation');
-   assert.ok(samples.some(row=>row.path==='/'+destination&&row.opacity<0.92),'destination must visibly fade in');
+   const incoming=samples.filter(row=>row.path==='/'+destination);
+   if(reduced) assert.ok(samples.every(row=>row.transform==='none'),'reduced motion keeps the viewport stationary');
+   else assert.ok(samples.some(row=>row.path===from&&row.opacity<0.78),'outgoing screen must visibly fade before navigation');
+   assert.ok(incoming.some(row=>row.opacity<0.72),'destination must visibly fade in');
    assert.equal(samples.at(-1).opacity,1,'the destination returns to full opacity');
    assert.ok(samples.every(row=>row.navFilter==='none'),'navigation stays sharp');
    assert.ok(samples.every(row=>row.filter==='none'),'the transition never filters the whole scene');
-   assert.ok(samples.some(row=>row.browserTimeline>0),'the browser owns the animated frames');
+   assert.ok(incoming.some(row=>row.browserTimeline>0&&row.opacity>0.61&&row.opacity<0.98),'the destination paints interpolated animation frames');
    return {from,to:'/'+destination,minOpacity:Math.min(...samples.map(row=>row.opacity))};
   };
   const before=await page.getByTestId('nav-events').boundingBox();
@@ -140,9 +142,8 @@ try {
   }
   await page.getByTestId('nav-events').dispatchEvent('click');await page.getByTestId('nav-reports').dispatchEvent('click');
   await page.waitForURL('**/alertas');await idle();
-  await page.emulateMedia({reducedMotion:'reduce'});await page.getByTestId('nav-events').click();await page.waitForURL('**/eventos');await idle();
-  const reducedTransform=await page.getByTestId('tab-transition-scene').evaluate(element=>getComputedStyle(element).transform);
-  assert.equal(reducedTransform,'none','reduced motion fades without moving the scene');
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await trace(page.getByTestId('nav-events'),'eventos',{reduced:true});
 
   // Selected place classification is hydrated through the real services/parser.
   await page.goto(base+'/mapa?placeId='+placeId,{waitUntil:'domcontentloaded'});
