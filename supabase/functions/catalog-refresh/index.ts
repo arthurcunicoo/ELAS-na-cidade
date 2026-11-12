@@ -25,4 +25,4 @@ Deno.serve(observeEdge(createRefreshHandler({
     const {error} = await admin.rpc("finalizar_catalogo_job", {p_lease: lease, p_recebidos: received, p_erro: code});
     if (error) throw error;
   },
-}), "catalog-refresh", "1.1.0-atomic.1"));
+}), "catalog-refresh", "1.1.0-atomic.2"));
