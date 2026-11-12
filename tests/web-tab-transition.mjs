@@ -53,14 +53,14 @@ try {
  assert.equal(style.transform,undefined,'idle scene has no transform');
  await go('/eventos');assert.equal(motion.moving,true);assert.deepEqual(routes,[]);
  assert.equal(transitions.at(-1).from.opacity,'1');
- assert.equal(style.opacity,'0.64');
- assert.match(style.transition,/opacity 145ms.*transform 145ms/);
+ assert.equal(style.opacity,'0.60');
+ assert.match(style.transition,/opacity 260ms.*transform 260ms/);
  assert.ok(!style.transition.includes('filter'),'a transition must not blur the full viewport');
  await complete(undefined,{});assert.equal(motion.moving,true,'nested transitions cannot complete navigation');
  await complete();await step();assert.deepEqual(routes,[],'outgoing frame must reach a paint boundary');await step();
  assert.deepEqual(routes,['/eventos']);path='/eventos';await update();
  assert.equal(style.opacity,'0.60','destination starts with the incoming fade');
- assert.match(style.transform,/20px/);
+ assert.match(style.transform,/scale\(1\.018\)/);
  await paint();await complete();
  assert.equal(style.transition,undefined);assert.equal(style.transform,undefined);
  assert.equal(attributes.has('data-elas-motion'),false);assert.equal(motion.moving,false);

@@ -91,7 +91,7 @@ try {
  await go('/eventos');assert.equal(blur().length,0,'Android 12+ blurs the scene without capturing the native stack');
  await finish(animations.at(-1));
  const androidStyle=renderer.root.findByProps({'testID':'tab-transition-scene'}).props.style[1].evaluate();
- assert.deepEqual(androidStyle.filter,[{blur:14}]);assert.equal(androidStyle.opacity,.84);
+ assert.deepEqual(androidStyle.filter,[{blur:14}]);assert.equal(androidStyle.opacity,.60);
  path='/eventos';await update();await finish(animations.at(-1));
  native.Platform.OS='ios';await update();await go('/perfil');assert.equal(blur().length,1,'iOS retains native backdrop blur');
  await finish(animations.at(-1));assert.equal(blur()[0].props.animatedProps.evaluate().intensity,85);

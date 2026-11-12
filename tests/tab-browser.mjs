@@ -74,7 +74,17 @@ try {
    unknown.push(request.method()+' '+url.pathname);
    return route.fulfill({status:500,contentType:'application/json',body:JSON.stringify({message:'Unconfigured isolated fixture'})});
   });
+  await page.addInitScript(() => {
+   window.__cityPositions=[];
+   const sample=()=>{
+    const city=document.querySelector('[data-city-entrance="ready"]');
+    if(city) window.__cityPositions.push(new DOMMatrixReadOnly(getComputedStyle(city).transform).m42);
+    if(window.__cityPositions.length<70) requestAnimationFrame(sample);
+   };
+   requestAnimationFrame(sample);
+  });
   await page.goto(base+'/login',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>window.__cityPositions.some(y=>y>40)&&window.__cityPositions.some(y=>y>2&&y<30)&&window.__cityPositions.includes(0));
   await page.getByTestId('auth-email').fill('browser-qa@example.invalid',{timeout:90000});
   await page.getByTestId('auth-password').fill('local-fixture-only');
   await page.getByRole('button',{name:'Entrar',exact:true}).click();

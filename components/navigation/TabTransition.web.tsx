@@ -5,10 +5,9 @@ import { registerNavigationTransition } from "../../lib/navigation";
 export const mainTabPaths = ["/mapa", "/eventos", "/alertas", "/perfil"] as const;
 const authPaths = new Set(["/", "/login", "/cadastro", "/recuperar-senha"]);
 const animatedRoute = (path: string) => !authPaths.has(path);
-const EXIT_MS = 145, ENTER_MS = 280, REDUCED_ENTER_MS = 220;
+const EXIT_MS = 260, ENTER_MS = 340, REDUCED_ENTER_MS = 220;
 const focused = { transform: "none", opacity: "1" };
-const leaving = { transform: "translate3d(0, -10px, 0)", opacity: "0.64" };
-const arriving = { transform: "translate3d(0, 20px, 0)", opacity: "0.60" };
+const faded = { transform: "scale(1.018)", opacity: "0.60" };
 const reducedArrival = { transform: "none", opacity: "0.60" };
 const panelBackground = { transform: "scale(0.993)", opacity: "0.87" };
 type Frame = typeof focused;
@@ -154,7 +153,7 @@ export function TabTransitionProvider({ path, reduced, children }: { path: strin
     }
     pending.current = { destination, source: route.current, dispatch, dispatched: false };
     setMoving(true);
-    play(leaving, EXIT_MS, () => afterPaint(() => {
+    play(faded, EXIT_MS, () => afterPaint(() => {
       const request = pending.current;
       if (!request) return;
       request.dispatched = true;
@@ -198,11 +197,11 @@ export function TabTransitionProvider({ path, reduced, children }: { path: strin
     } else if (request?.dispatched && (
       request.destination === path || (!request.destination && request.source !== path)
     )) {
-      focus(arriving);
+      focus(faded);
     } else if (!request && from !== path && animatedRoute(from)) {
       // Browser Back and route changes outside the navigation helper still animate.
       setMoving(!reduced);
-      focus(reduced ? reducedArrival : arriving);
+      focus(reduced ? reducedArrival : faded);
     }
   }, [path, reduced, apply, focus, stop]);
   useLayoutEffect(() => registerNavigationTransition(navigate), [navigate]);

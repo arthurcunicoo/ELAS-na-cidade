@@ -138,7 +138,7 @@ export function TabTransitionViewport({ children }: { children: ReactNode }) {
   const foreground = web || androidFilter;
   const sceneMotion = useAnimatedStyle(() => ({
     transform: [{ scale: 1 + progress.value * 0.018 }],
-    opacity: 1 - progress.value * 0.16,
+    opacity: 1 - progress.value * 0.40,
     // Android 12+ blurs the rendered scene itself, including native screens.
     // This does not depend on a backdrop capturing the navigator correctly.
     ...(web ? { filter: `blur(${progress.value * 14}px)` }
